@@ -1,0 +1,24 @@
+[gd_scene load_steps=2 format=3 uid="uid://4e728yqgfrlm"]
+
+[ext_resource type="Script" uid="uid://d28baolm7pt0q" path="res://gui/hud.gd" id="1_yfp4d"]
+
+[node name="Game" type="CanvasLayer"]
+
+[node name="HUD" type="VBoxContainer" parent="."]
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_yfp4d")
+
+[node name="LivesLabel" type="Label" parent="HUD"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Lives:"
+
+[node name="CashLabel" type="Label" parent="HUD"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Cash:"
+
+[node name="Label3" type="Label" parent="HUD"]
+layout_mode = 2
+text = "Round:"

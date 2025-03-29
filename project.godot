@@ -1,0 +1,30 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="bmc2 retry"
+run/main_scene="uid://dvojqgv3varqy"
+config/features=PackedStringArray("4.4", "GL Compatibility")
+config/icon="res://icon.svg"
+
+[autoload]
+
+GameManager="*res://game_manager.gd"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/AI-Context-Generator/plugin.cfg")
+
+[layer_names]
+
+3d_physics/layer_1="Bloons"
+3d_physics/layer_2="TowerRange"
+3d_physics/layer_3="Projectiles"

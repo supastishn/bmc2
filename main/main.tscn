@@ -1,0 +1,59 @@
+[gd_scene load_steps=13 format=3 uid="uid://dvojqgv3varqy"]
+
+[ext_resource type="PackedScene" uid="uid://30l774cnywje" path="res://ground/ground.tscn" id="1_xwkvk"]
+[ext_resource type="Script" uid="uid://6tn6tqegaov5" path="res://main/WaveManager.gd" id="2_c651c"]
+[ext_resource type="PackedScene" uid="uid://bbgtd6k2hdso3" path="res://path/Level.tscn" id="3_3wy1v"]
+[ext_resource type="PackedScene" uid="uid://crsba2g1suw8h" path="res://bloon/bloon.tscn" id="3_c651c"]
+[ext_resource type="PackedScene" uid="uid://csfgptdeslwf7" path="res://tower/tower.tscn" id="5_3wy1v"]
+[ext_resource type="PackedScene" uid="uid://cf6qam72p2tw7" path="res://projectile/projectile.tscn" id="6_67ri8"]
+[ext_resource type="PackedScene" uid="uid://4e728yqgfrlm" path="res://gui/game.tscn" id="6_kfbq2"]
+[ext_resource type="Script" uid="uid://xk5g8hgbosn6" path="res://stats/tower_stats.gd" id="7_grrlh"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_rxg2q"]
+
+[sub_resource type="Sky" id="Sky_glv2v"]
+sky_material = SubResource("ProceduralSkyMaterial_rxg2q")
+
+[sub_resource type="Environment" id="Environment_uu6xs"]
+sky = SubResource("Sky_glv2v")
+ambient_light_source = 3
+reflected_light_source = 2
+
+[sub_resource type="Resource" id="Resource_0i4oc"]
+script = ExtResource("7_grrlh")
+attack_cooldown = 0.1
+range = 2.0
+can_see_camo = true
+projectile_scene = ExtResource("6_67ri8")
+metadata/_custom_type_script = "uid://xk5g8hgbosn6"
+
+[node name="Main" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_uu6xs")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1.19249e-08, 1, 0, -1, 1.19249e-08, 0, 3.42508, 0)
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1.19249e-08, 1, 0, -1, 1.19249e-08, 0, 6.30396, 0)
+current = true
+
+[node name="Ground" parent="." instance=ExtResource("1_xwkvk")]
+
+[node name="WaveManager" type="Node" parent="." node_paths=PackedStringArray("path_node")]
+script = ExtResource("2_c651c")
+bloon_scene = ExtResource("3_c651c")
+path_node = NodePath("../Level")
+
+[node name="SpawnTimer" type="Timer" parent="WaveManager"]
+
+[node name="WaveTimer" type="Timer" parent="WaveManager"]
+
+[node name="Level" parent="." instance=ExtResource("3_3wy1v")]
+
+[node name="Tower" parent="." instance=ExtResource("5_3wy1v")]
+transform = Transform3D(0.999512, -0.0312363, 0, 0.0312363, 0.999512, 0, 0, 0, 1, 3.05494, 0.982723, 1.95739)
+stats = SubResource("Resource_0i4oc")
+
+[node name="Game" parent="." instance=ExtResource("6_kfbq2")]

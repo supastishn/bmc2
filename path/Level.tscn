@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://bbgtd6k2hdso3"]
+
+[sub_resource type="Curve3D" id="Curve3D_ahyv7"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0.3, 0, 0, 0, 0, 0, 0, 0, 3, 0.3, 0, 0, 0, 0, 0, 0, 0, 3, 0.3, -3, 0, 0, 0, 0, 0, 0, 0, 0.3, -3, 0, 0, 0, 0, 0, 0, 0, 0.3, 0),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0)
+}
+point_count = 5
+
+[sub_resource type="TubeTrailMesh" id="TubeTrailMesh_ahyv7"]
+radius = 0.062
+
+[node name="Level" type="Path3D"]
+curve = SubResource("Curve3D_ahyv7")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("TubeTrailMesh_ahyv7")
