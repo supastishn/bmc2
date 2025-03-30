@@ -1,18 +1,6 @@
-[gd_scene load_steps=6 format=3 uid="uid://cf6qam72p2tw7"]
+[gd_scene load_steps=4 format=3 uid="uid://cf6qam72p2tw7"]
 
 [ext_resource type="Script" uid="uid://du6b728elrc30" path="res://projectile/projectile.gd" id="1_6aa83"]
-[ext_resource type="Script" uid="uid://drsahx6guyrjh" path="res://stats/projectile_stats.gd" id="2_makwg"]
-
-[sub_resource type="Resource" id="Resource_dr2av"]
-script = ExtResource("2_makwg")
-speed = 5.0
-damage = 1
-lifetime = 1.0
-pierce = 1
-can_pop_lead = false
-homing_enabled = false
-homing_turn_rate = 5.0
-metadata/_custom_type_script = "uid://drsahx6guyrjh"
 
 [sub_resource type="SphereMesh" id="SphereMesh_ml5en"]
 radius = 0.1
@@ -24,7 +12,6 @@ radius = 0.1
 [node name="Projectile" type="Area3D"]
 collision_layer = 4
 script = ExtResource("1_6aa83")
-stats = SubResource("Resource_dr2av")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 mesh = SubResource("SphereMesh_ml5en")

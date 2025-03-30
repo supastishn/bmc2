@@ -3,7 +3,8 @@ extends Area3D
 
 # REMOVED: signal returned_to_pool(node: Node)
 
-@export var stats: ProjectileStats # Stats are now assigned ONCE by the tower pool init
+# @export var stats: ProjectileStats # Stats are now assigned by set_stats or pool_reset
+var stats: ProjectileStats # Internal reference
 
 # Internal state
 var current_pierce: int = 1
@@ -22,20 +23,38 @@ func _ready():
 	lifetime_timer.stop()
 	if not area_entered.is_connected(_on_area_entered):
 		area_entered.connect(_on_area_entered)
-	# Ensure mesh is set based on initial stats (assigned by tower pool init)
+	# Mesh is applied when stats are set
+
+
+# --- NEW: Method to explicitly set stats ---
+func set_stats(p_stats: ProjectileStats):
+	if not p_stats:
+		printerr("Projectile %s received null stats!" % name)
+		stats = ProjectileStats.new() # Fallback to default
+	else:
+		stats = p_stats
+	# Apply mesh whenever stats are set or reset
 	_apply_mesh_from_stats()
+	# Reset internal state based on these stats (like in pool_reset)
+	current_pierce = stats.pierce if stats else 1
+	if lifetime_timer:
+		lifetime_timer.wait_time = stats.lifetime if stats else 1.0
 
 
 # Called by the Tower's pool logic when reusing the node.
 func pool_reset():
 	is_released = false
 	if not stats:
-		# This shouldn't happen if initialized correctly by the tower pool
-		printerr("Projectile %s trying to reset without stats!" % name)
-		# We can't really recover here easily, maybe force release?
-		if owner_tower and owner_tower.has_method("_return_projectile_to_pool"):
-			owner_tower._return_projectile_to_pool(self)
-		return
+		# This *shouldn't* happen if set_stats was called during pool init/re-init
+		printerr("Projectile %s trying to reset without assigned stats!" % name)
+		# Attempt to get default stats? Or just return? Let's try assigning default.
+		set_stats(ProjectileStats.new()) # Assign default stats if missing
+		# If it still fails, we might have a bigger issue
+		if not stats:
+			printerr("Projectile %s failed to get default stats on reset!" % name)
+			if owner_tower and owner_tower.has_method("_return_projectile_to_pool"):
+				owner_tower._return_projectile_to_pool(self)
+			return
 
 	# Reset internal state based on the already assigned stats
 	current_pierce = stats.pierce
@@ -43,23 +62,27 @@ func pool_reset():
 	move_direction = Vector3.FORWARD
 	visible = true
 	if lifetime_timer:
-	# Reset timer duration and ensure it's stopped
+		# Reset timer duration and ensure it's stopped
 		lifetime_timer.wait_time = stats.lifetime
 		lifetime_timer.stop()
 
 	# Ensure physics process is enabled
 	set_physics_process(true)
-	# Mesh should already be correct from initial pool setup
+	# Mesh should be correct from the last set_stats call
 
 
 # Called by the Tower *after* adding the projectile to the scene tree.
 func activate():
+	if not stats:
+		printerr("Projectile %s activated without stats!" % name)
+		release_to_pool()
+		return
 	lifetime_timer.start()
 
 
 func _physics_process(delta):
+	if not stats or is_released: return # Check stats validity here
 	# ... (Movement logic remains the same) ...
-	if not stats or is_released: return
 	var velocity: Vector3 = Vector3.ZERO
 	var can_home = stats.homing_enabled and is_instance_valid(target)
 	if can_home:
@@ -79,12 +102,14 @@ func _physics_process(delta):
 
 
 func initialize_direction(initial_direction: Vector3):
+	if not stats: return # Check stats validity
 	# ... (Remains the same) ...
 	if not stats.homing_enabled:
 		move_direction = initial_direction.normalized()
 
 
 func set_target(t: Node3D):
+	if not stats: return # Check stats validity
 	# ... (Remains the same) ...
 	if stats and stats.homing_enabled:
 		target = t
@@ -93,8 +118,8 @@ func set_target(t: Node3D):
 
 
 func _on_area_entered(other_area: Area3D):
+	if not stats or is_released: return # Check stats validity
 	# ... (Hit detection logic remains mostly the same) ...
-	if not stats or is_released: return
 	var parent_node = other_area.get_parent()
 	if not (parent_node is PathFollow3D and parent_node.is_in_group("bloons") and current_pierce > 0):
 		return
@@ -118,7 +143,7 @@ func release_to_pool():
 
 	set_physics_process(false)
 	visible = false
-	lifetime_timer.stop()
+	if lifetime_timer: lifetime_timer.stop() # Ensure timer exists
 
 	# Remove from scene tree
 	if get_parent():
@@ -129,7 +154,9 @@ func release_to_pool():
 		# Use call_deferred to avoid potential issues if called during physics process
 		owner_tower._return_projectile_to_pool.call_deferred(self)
 	else:
-		printerr("Projectile %s cannot return to pool: Owner tower invalid or missing method." % name)
+		# Don't print error if owner_tower is null (might happen during scene close)
+		if owner_tower:
+			printerr("Projectile %s cannot return to pool: Owner tower invalid or missing method." % name)
 		# If it can't return, free it to prevent leaks
 		queue_free()
 
@@ -140,3 +167,7 @@ func release_to_pool():
 func _apply_mesh_from_stats():
 	if mesh_instance and stats and stats.mesh:
 		mesh_instance.mesh = stats.mesh
+	elif mesh_instance:
+		# Optionally set a default mesh if stats or stats.mesh is null
+		# mesh_instance.mesh = preload("res://path/to/default_projectile_mesh.tres")
+		pass # Or do nothing, leaving it as is

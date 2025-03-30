@@ -1,0 +1,100 @@
+[gd_scene load_steps=2 format=3 uid="uid://d2m3h41bwnr6"]
+
+[ext_resource type="Script" uid="uid://b7708ygft524s" path="res://gui/tower_upgrade_gui.gd" id="1_bgc2t"]
+
+[node name="TowerUpgradeGUI" type="Control"]
+layout_mode = 3
+anchor_left = 0.9
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 0
+grow_vertical = 2
+script = ExtResource("1_bgc2t")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MainVbox" type="VBoxContainer" parent="PanelContainer"]
+layout_mode = 2
+
+[node name="TowerNameLabel" type="Label" parent="PanelContainer/MainVbox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "hi
+"
+
+[node name="HSeparator" type="HSeparator" parent="PanelContainer/MainVbox"]
+layout_mode = 2
+
+[node name="UpgradePathsHBox" type="VBoxContainer" parent="PanelContainer/MainVbox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Path1Vbox" type="HBoxContainer" parent="PanelContainer/MainVbox/UpgradePathsHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Path1Tier1Button" type="Button" parent="PanelContainer/MainVbox/UpgradePathsHBox/Path1Vbox"]
+layout_mode = 2
+
+[node name="Path1Tier2Button" type="Button" parent="PanelContainer/MainVbox/UpgradePathsHBox/Path1Vbox"]
+layout_mode = 2
+
+[node name="Path1Tier3Button" type="Button" parent="PanelContainer/MainVbox/UpgradePathsHBox/Path1Vbox"]
+layout_mode = 2
+
+[node name="Path1Tier4Button" type="Button" parent="PanelContainer/MainVbox/UpgradePathsHBox/Path1Vbox"]
+layout_mode = 2
+
+[node name="Path1Tier5Button" type="Button" parent="PanelContainer/MainVbox/UpgradePathsHBox/Path1Vbox"]
+layout_mode = 2
+
+[node name="Path2Vbox" type="HBoxContainer" parent="PanelContainer/MainVbox/UpgradePathsHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Path2Tier1Button" type="Button" parent="PanelContainer/MainVbox/UpgradePathsHBox/Path2Vbox"]
+layout_mode = 2
+
+[node name="Path2Tier2Button" type="Button" parent="PanelContainer/MainVbox/UpgradePathsHBox/Path2Vbox"]
+layout_mode = 2
+
+[node name="Path2Tier3Button" type="Button" parent="PanelContainer/MainVbox/UpgradePathsHBox/Path2Vbox"]
+layout_mode = 2
+
+[node name="Path2Tier4Button" type="Button" parent="PanelContainer/MainVbox/UpgradePathsHBox/Path2Vbox"]
+layout_mode = 2
+
+[node name="Path2Tier5Button" type="Button" parent="PanelContainer/MainVbox/UpgradePathsHBox/Path2Vbox"]
+layout_mode = 2
+
+[node name="Path3Vbox" type="HBoxContainer" parent="PanelContainer/MainVbox/UpgradePathsHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Path3Tier1Button" type="Button" parent="PanelContainer/MainVbox/UpgradePathsHBox/Path3Vbox"]
+layout_mode = 2
+
+[node name="Path3Tier2Button" type="Button" parent="PanelContainer/MainVbox/UpgradePathsHBox/Path3Vbox"]
+layout_mode = 2
+
+[node name="Path3Tier3Button" type="Button" parent="PanelContainer/MainVbox/UpgradePathsHBox/Path3Vbox"]
+layout_mode = 2
+
+[node name="Path3Tier4Button" type="Button" parent="PanelContainer/MainVbox/UpgradePathsHBox/Path3Vbox"]
+layout_mode = 2
+
+[node name="Path3Tier5Button" type="Button" parent="PanelContainer/MainVbox/UpgradePathsHBox/Path3Vbox"]
+layout_mode = 2
+
+[node name="HSeparator2" type="HSeparator" parent="PanelContainer/MainVbox"]
+layout_mode = 2
+
+[node name="SellButton" type="Button" parent="PanelContainer/MainVbox"]
+unique_name_in_owner = true
+layout_mode = 2
