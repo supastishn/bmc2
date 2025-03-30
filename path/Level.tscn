@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=3 uid="uid://bbgtd6k2hdso3"]
+[gd_scene load_steps=4 format=3 uid="uid://bbgtd6k2hdso3"]
 
 [sub_resource type="Curve3D" id="Curve3D_ahyv7"]
 _data = {
@@ -10,8 +10,19 @@ point_count = 5
 [sub_resource type="TubeTrailMesh" id="TubeTrailMesh_ahyv7"]
 radius = 0.062
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_ahyv7"]
+size = Vector3(3.027, 0.191, 3.03)
+
 [node name="Level" type="Path3D"]
 curve = SubResource("Curve3D_ahyv7")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 mesh = SubResource("TubeTrailMesh_ahyv7")
+
+[node name="TrackArea" type="Area3D" parent="."]
+collision_layer = 64
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TrackArea"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.47, 0, -1.611)
+shape = SubResource("BoxShape3D_ahyv7")

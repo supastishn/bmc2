@@ -17,7 +17,9 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-GameManager="*res://game_manager.gd"
+GameManager="*res://autoloads/game_manager.gd"
+NodePoolManager="*res://autoloads/pool_manager.gd"
+TowerFactory="*res://autoloads/tower_factory.gd"
 
 [editor_plugins]
 
@@ -28,3 +30,8 @@ enabled=PackedStringArray("res://addons/AI-Context-Generator/plugin.cfg")
 3d_physics/layer_1="Bloons"
 3d_physics/layer_2="TowerRange"
 3d_physics/layer_3="Projectiles"
+3d_physics/layer_4="Environment"
+3d_physics/layer_5="Placeable Ground"
+3d_physics/layer_6="Placed Towers"
+3d_physics/layer_7="Track"
+3d_physics/layer_8="Selectable Towers"

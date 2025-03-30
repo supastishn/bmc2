@@ -9,7 +9,7 @@ health = 1
 speed = 2.0
 cash_value = 1
 child_bloon_count = 0
-is_camo = true
+is_camo = false
 is_lead = false
 metadata/_custom_type_script = "uid://doec7st6wpdi3"
 

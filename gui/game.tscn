@@ -1,8 +1,10 @@
-[gd_scene load_steps=2 format=3 uid="uid://4e728yqgfrlm"]
+[gd_scene load_steps=3 format=3 uid="uid://4e728yqgfrlm"]
 
 [ext_resource type="Script" uid="uid://d28baolm7pt0q" path="res://gui/hud.gd" id="1_yfp4d"]
+[ext_resource type="PackedScene" uid="uid://b1a2b3c4d5e6" path="res://gui/tower_placement_gui.tscn" id="2_83t4r"]
 
 [node name="Game" type="CanvasLayer"]
+follow_viewport_enabled = true
 
 [node name="HUD" type="VBoxContainer" parent="."]
 offset_right = 40.0
@@ -22,3 +24,6 @@ text = "Cash:"
 [node name="Label3" type="Label" parent="HUD"]
 layout_mode = 2
 text = "Round:"
+
+[node name="TowerPlacementGUI" parent="." instance=ExtResource("2_83t4r")]
+visibility_layer = 131073

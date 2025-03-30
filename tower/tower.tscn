@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://csfgptdeslwf7"]
+[gd_scene load_steps=8 format=3 uid="uid://csfgptdeslwf7"]
 
 [ext_resource type="Script" uid="uid://byd7fcwobx142" path="res://tower/tower.gd" id="1_758mn"]
 [ext_resource type="Script" uid="uid://xk5g8hgbosn6" path="res://stats/tower_stats.gd" id="2_3fjlj"]
@@ -14,6 +14,10 @@ metadata/_custom_type_script = "uid://xk5g8hgbosn6"
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_758mn"]
 radius = 2.0
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_3fjlj"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_4ulc0"]
 
 [node name="Tower" type="Node3D"]
 script = ExtResource("1_758mn")
@@ -32,3 +36,17 @@ shape = SubResource("CylinderShape3D_758mn")
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0.3, 0)
 
 [node name="CooldownTimer" type="Timer" parent="."]
+
+[node name="PlacementBody" type="StaticBody3D" parent="."]
+collision_layer = 32
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PlacementBody"]
+shape = SubResource("CapsuleShape3D_3fjlj")
+
+[node name="SelectionArea" type="StaticBody3D" parent="."]
+collision_layer = 128
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SelectionArea"]
+shape = SubResource("CapsuleShape3D_4ulc0")
