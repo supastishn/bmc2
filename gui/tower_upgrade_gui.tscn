@@ -35,62 +35,20 @@ layout_mode = 2
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Path1Vbox" type="HBoxContainer" parent="PanelContainer/MainVbox/UpgradePathsHBox"]
+[node name="UpgradePath1Button" type="Button" parent="PanelContainer/MainVbox/UpgradePathsHBox"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_vertical = 3
 
-[node name="Path1Tier1Button" type="Button" parent="PanelContainer/MainVbox/UpgradePathsHBox/Path1Vbox"]
-layout_mode = 2
-
-[node name="Path1Tier2Button" type="Button" parent="PanelContainer/MainVbox/UpgradePathsHBox/Path1Vbox"]
-layout_mode = 2
-
-[node name="Path1Tier3Button" type="Button" parent="PanelContainer/MainVbox/UpgradePathsHBox/Path1Vbox"]
-layout_mode = 2
-
-[node name="Path1Tier4Button" type="Button" parent="PanelContainer/MainVbox/UpgradePathsHBox/Path1Vbox"]
-layout_mode = 2
-
-[node name="Path1Tier5Button" type="Button" parent="PanelContainer/MainVbox/UpgradePathsHBox/Path1Vbox"]
-layout_mode = 2
-
-[node name="Path2Vbox" type="HBoxContainer" parent="PanelContainer/MainVbox/UpgradePathsHBox"]
+[node name="UpgradePath2Button" type="Button" parent="PanelContainer/MainVbox/UpgradePathsHBox"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_vertical = 3
 
-[node name="Path2Tier1Button" type="Button" parent="PanelContainer/MainVbox/UpgradePathsHBox/Path2Vbox"]
-layout_mode = 2
-
-[node name="Path2Tier2Button" type="Button" parent="PanelContainer/MainVbox/UpgradePathsHBox/Path2Vbox"]
-layout_mode = 2
-
-[node name="Path2Tier3Button" type="Button" parent="PanelContainer/MainVbox/UpgradePathsHBox/Path2Vbox"]
-layout_mode = 2
-
-[node name="Path2Tier4Button" type="Button" parent="PanelContainer/MainVbox/UpgradePathsHBox/Path2Vbox"]
-layout_mode = 2
-
-[node name="Path2Tier5Button" type="Button" parent="PanelContainer/MainVbox/UpgradePathsHBox/Path2Vbox"]
-layout_mode = 2
-
-[node name="Path3Vbox" type="HBoxContainer" parent="PanelContainer/MainVbox/UpgradePathsHBox"]
+[node name="UpgradePath3Button" type="Button" parent="PanelContainer/MainVbox/UpgradePathsHBox"]
 unique_name_in_owner = true
 layout_mode = 2
-
-[node name="Path3Tier1Button" type="Button" parent="PanelContainer/MainVbox/UpgradePathsHBox/Path3Vbox"]
-layout_mode = 2
-
-[node name="Path3Tier2Button" type="Button" parent="PanelContainer/MainVbox/UpgradePathsHBox/Path3Vbox"]
-layout_mode = 2
-
-[node name="Path3Tier3Button" type="Button" parent="PanelContainer/MainVbox/UpgradePathsHBox/Path3Vbox"]
-layout_mode = 2
-
-[node name="Path3Tier4Button" type="Button" parent="PanelContainer/MainVbox/UpgradePathsHBox/Path3Vbox"]
-layout_mode = 2
-
-[node name="Path3Tier5Button" type="Button" parent="PanelContainer/MainVbox/UpgradePathsHBox/Path3Vbox"]
-layout_mode = 2
+size_flags_vertical = 3
 
 [node name="HSeparator2" type="HSeparator" parent="PanelContainer/MainVbox"]
 layout_mode = 2

@@ -1,318 +1,392 @@
 # File: res://tower/tower.gd
 extends Node3D
 
+# Stats are dynamically assigned/updated
 @export var stats: TowerStats
-@export var projectile_stats: ProjectileStats # Assigned by Main.gd after factory call
+@export var projectile_stats: ProjectileStats
 
-# --- NEW STATE VARIABLES ---
-var tower_name: String = "unknown" # Set by Main.gd on placement
-var upgrade_path: String = "000"   # Current upgrade path (e.g., "102")
-var total_spent: int = 0           # Tracks base cost + upgrade costs
+# --- NEW: Tower State ---
+var tower_name: String = "unknown"
+var upgrade_levels: Array[int] = [0, 0, 0] # Path 1, Path 2, Path 3 tiers
+var total_spent: int = 0
 
 @onready var range_area: Area3D = $Area3D
 @onready var cooldown_timer: Timer = $CooldownTimer
 @onready var projectile_spawn_point: Marker3D = $ProjectileSpawnPoint
 @onready var range_collision_shape: CollisionShape3D = $Area3D/CollisionShape3D
 @onready var mesh_instance: MeshInstance3D = $MeshInstance3D
-# Ensure PlacementBody exists and has a CollisionShape3D for clicking
-@onready var placement_body: StaticBody3D = $PlacementBody
-@onready var placement_collision_shape: CollisionShape3D = $PlacementBody/CollisionShape3D
-
 
 var targets_in_range = []
-
-# --- Tower's Local Projectile Pool ---
 var _projectile_pool: Array[Node] = []
-@export var projectile_pool_size: int = 10 # How many projectiles to pre-warm
+@export var projectile_pool_size: int = 10
 
-func _ready():
-	# Basic validation and fallbacks (consider if fallbacks are desired)
-	if not stats:
-		printerr("Tower %s missing its TowerStats resource! Using default." % name)
-		stats = TowerStats.new() # Assign a default to prevent crashes
-	if not projectile_stats:
-		printerr("Tower %s missing its ProjectileStats resource! Using default." % name)
-		projectile_stats = ProjectileStats.new() # Assign a default
-	if not stats.projectile_scene:
-		printerr("Tower %s stats resource is missing its Projectile Scene! Using default." % name)
-		# Assign a default scene if possible, otherwise attacking will fail
-		stats.projectile_scene = preload("res://projectile/projectile.tscn")
+# No _ready() needed here anymore, configuration happens after stats are set
 
-	# Defer configuration to ensure stats are likely assigned by Main.gd
-	call_deferred("_configure_tower")
+# --- NEW: Called by Main.gd after instantiation and stat assignment ---
+func set_initial_state(p_tower_name: String, base_cost: int):
+	tower_name = p_tower_name
+	total_spent = base_cost
+	upgrade_levels = [0, 0, 0] # Ensure reset on placement
+	# Initial configuration based on assigned 0-0-0 stats
+	_configure_tower()
+	# Initialize pool after configuration
+	_initialize_projectile_pool()
+	# Connect signals here, ensuring nodes are ready
+	_connect_signals()
 
-	# Connect signals
-	if not range_area.area_entered.is_connected(_on_range_area_entered):
+
+func _connect_signals():
+	cooldown_timer = $CooldownTimer
+	if range_area and not range_area.area_entered.is_connected(_on_range_area_entered):
 		range_area.area_entered.connect(_on_range_area_entered)
-	if not range_area.area_exited.is_connected(_on_range_area_exited):
+	if range_area and not range_area.area_exited.is_connected(_on_range_area_exited):
 		range_area.area_exited.connect(_on_range_area_exited)
-
-	# Ensure CooldownTimer exists and connect its timeout signal
-	if not cooldown_timer:
-		printerr("CooldownTimer node not found in Tower %s!" % name)
-		set_physics_process(false) # Disable processing if timer is missing
-		return
-	# Check connection status before connecting
-	if not cooldown_timer.timeout.is_connected(_on_cooldown_timer_timeout):
+	if cooldown_timer and not cooldown_timer.timeout.is_connected(_on_cooldown_timer_timeout):
 		cooldown_timer.timeout.connect(_on_cooldown_timer_timeout)
-
-	# Initialize the local projectile pool (deferred)
-	call_deferred("_initialize_projectile_pool")
-
-	# Ensure the placement body is on a layer Main.gd can raycast against
-	if placement_body:
-		placement_body.collision_layer = 1 << (6 - 1) # Example: Layer 6 for placed towers
-		placement_body.collision_mask = 0 # Doesn't need to detect anything itself
-	else:
-		printerr("Tower %s missing PlacementBody!" % name)
+	elif not cooldown_timer:
+		printerr("CooldownTimer node not found in Tower %s!" % name)
 
 
-# Deferred setup function
 func _configure_tower():
-	# Check again if stats are valid before configuring
 	if not stats or not projectile_stats:
-		printerr("Tower %s configure deferred: Stats still not ready." % name)
+		printerr("Tower %s configure failed: Stats not ready." % name)
 		return
 
-	print_debug("Configuring tower %s (%s)" % [name, upgrade_path])
+	# print_debug("Configuring tower %s with path %s" % [name, get_upgrade_path_string()])
 	if mesh_instance and stats.mesh:
 		mesh_instance.mesh = stats.mesh
+	elif mesh_instance:
+		print_debug("Tower %s configured, but no mesh found in stats." % name)
 
-	# Update range visualization/collision shape
+	range_collision_shape = $Area3D/CollisionShape3D
 	if range_collision_shape and range_collision_shape.shape:
-		if range_collision_shape.shape is CylinderShape3D or range_collision_shape.shape is SphereShape3D:
+		# Use CylinderShape3D or SphereShape3D depending on what you use in the scene
+		if range_collision_shape.shape is CylinderShape3D:
 			range_collision_shape.shape.radius = stats.range
-			# Optional: Update visual range indicator if you have one
+			# Optionally adjust height if needed: range_collision_shape.shape.height = some_value
+		elif range_collision_shape.shape is SphereShape3D:
+			range_collision_shape.shape.radius = stats.range
 		else:
-			print_debug("Tower %s range shape is not Cylinder or Sphere." % name)
+			printerr("Tower %s range shape is not Cylinder or Sphere!" % name)
+
 	else:
 		printerr("Tower %s missing CollisionShape3D or shape for range area!" % name)
+	cooldown_timer = $CooldownTimer
+	if cooldown_timer:
+		cooldown_timer.wait_time = stats.attack_cooldown
+		cooldown_timer.one_shot = true # Ensure it's one_shot
+		cooldown_timer.stop() # Ensure it starts stopped
+	else:
+		printerr("Cannot configure cooldown timer - node not found!")
 
-	# Configure cooldown timer properties
-	cooldown_timer.wait_time = stats.attack_cooldown
-	cooldown_timer.one_shot = true # Ensure it's one-shot
 
-	# Re-initialize projectile pool if stats changed significantly (optional, might be overkill)
-	# Consider if projectile stats changes require pool re-initialization
-	# call_deferred("_initialize_projectile_pool") # Maybe not needed if pool handles stats correctly
-
-
-# Pre-warms the tower's specific projectile pool
 func _initialize_projectile_pool():
+	# Clear existing pool first in case of reconfiguration
+	for proj in _projectile_pool:
+		if is_instance_valid(proj): proj.queue_free()
+	_projectile_pool.clear()
+
 	if not stats or not projectile_stats or not stats.projectile_scene:
 		printerr("Tower %s cannot initialize projectile pool: Missing stats or scene." % name)
 		return
 
-	# Clear existing pool before re-initializing (important if called after upgrade)
-	for proj in _projectile_pool:
-		if is_instance_valid(proj):
-			proj.queue_free()
-	_projectile_pool.clear()
-
-	print("Tower %s initializing projectile pool (Size: %d)" % [name, projectile_pool_size])
+	# print_debug("Tower %s initializing projectile pool (Size: %d)" % [name, projectile_pool_size])
 	for i in range(projectile_pool_size):
 		var proj = stats.projectile_scene.instantiate()
-		# Check for necessary properties/methods before configuration
-		if proj is Area3D and proj.has_method('set_stats') and proj.has_method("pool_reset"): # Assuming set_stats method exists
-			proj.set_stats(projectile_stats) # Pass the specific stats
-			proj.owner_tower = self
-			# Mesh is now set within projectile based on its stats
+		# --- FIX START ---
+		# Check if it's the correct type and has the necessary methods/script
+		if proj is Area3D and proj.has_method("set_stats") and proj.has_method("pool_reset"):
+			proj.owner_tower = self # Assign owner first
+			proj.set_stats(projectile_stats) # Use the method to set stats and apply mesh/timer
+			# No need to set mesh here, set_stats handles it
 			_projectile_pool.append(proj)
+			# print_debug("Added projectile %s to pool for tower %s" % [proj.name, name]) # Optional debug
+		# --- FIX END ---
 		else:
 			printerr("Instantiated projectile scene is invalid or missing methods/properties for pooling.")
 			if is_instance_valid(proj): proj.queue_free()
 
 
 func _physics_process(delta):
-	# Ensure stats are loaded before processing physics
-	if not stats or not projectile_stats: return
-
-	targets_in_range = targets_in_range.filter(Callable(self, "_is_target_valid"))
+	if not stats or not projectile_stats: return # Don't process if not configured
+	
+	# Filter out invalid targets first
+	#print('original ', targets_in_range)
+	targets_in_range = targets_in_range.filter(_is_target_valid)
+	#print('new ', targets_in_range)
+	# Check if ready to fire
 	if not targets_in_range.is_empty() and cooldown_timer.is_stopped():
 		var target = choose_target()
-		if is_instance_valid(target):
+		if is_instance_valid(target): # Double check target validity
 			attack(target)
+		# else: print_debug("Chosen target was invalid.") # Optional debug
 
 
 func _is_target_valid(node):
-	# ... (no changes needed here) ...
-	if not is_instance_valid(node): return false
-	var node_stats: BloonStats = null
-	# Use safer 'get' method check
-	if node.has_method("get",):
-		node_stats = node.stats
-	if node_stats and node_stats.is_camo and (not stats or not stats.can_see_camo):
+	# Check if the node itself is valid
+	if not is_instance_valid(node):
+		# print_debug("Target invalid: Node instance is not valid.") # Optional debug
 		return false
+	# Check if it's still in the scene tree (might have been removed by pooling)
+	if not node.is_inside_tree():
+		# print_debug("Target invalid: Node %s is not in tree." % node.name) # Optional debug
+		return false
+	# Check if it's a bloon (has stats)
+	if not node.has_method("get") or node.get("stats") == null:
+		# print_debug("Target invalid: Node %s has no stats." % node.name) # Optional debug
+		return false
+	var node_stats: BloonStats = node.stats
+	# Check camo visibility
+	if node_stats.is_camo and (not stats or not stats.can_see_camo):
+		# print_debug("Target invalid: Node %s is camo, tower cannot see camo." % node.name) # Optional debug
+		return false
+	# Add any other checks if needed (e.g., specific immunities)
 	return true
 
 
 func choose_target():
-	# ... (no changes needed here) ...
-	var best_target = null; var max_progress = -1.0
+	# Simple target selection: Choose the bloon furthest along the path
+	var best_target = null
+	var max_progress = -1.0
 	for bloon_node in targets_in_range:
-		if not _is_target_valid(bloon_node): continue
+		# No need to call _is_target_valid again if filtered in _physics_process
+		# but double-checking doesn't hurt if timing issues are suspected.
+		# if not _is_target_valid(bloon_node): continue
 		if bloon_node is PathFollow3D:
-			if bloon_node.progress > max_progress:
-				max_progress = bloon_node.progress; best_target = bloon_node
+			# Use progress_ratio for consistency (0.0 to 1.0)
+			if bloon_node.progress_ratio > max_progress:
+				max_progress = bloon_node.progress_ratio
+				best_target = bloon_node
 	return best_target
 
 
 func attack(target: Node3D):
-	# ... (no changes needed here, relies on current stats) ...
-	if not stats or not projectile_stats or not stats.projectile_scene: return
+	if not stats or not projectile_stats or not stats.projectile_scene:
+		printerr("Attack cancelled: Missing stats or projectile scene.")
+		return
 
-	# --- Request projectile from LOCAL pool ---
 	var projectile_instance: Node = null
 	if not _projectile_pool.is_empty():
 		projectile_instance = _projectile_pool.pop_back()
+		# Reset should be called *after* retrieving from pool
 		if projectile_instance.has_method("pool_reset"):
 			projectile_instance.pool_reset()
-		# Ensure the reused projectile has the *current* stats
-		if projectile_instance.has_method("set_stats"):
-			projectile_instance.set_stats(projectile_stats)
+		# print_debug("Reusing projectile from pool.") # Optional debug
 	else:
-		# Fallback: Pool empty, instantiate a new one
 		printerr("Tower %s projectile pool empty! Instantiating fallback." % name)
 		projectile_instance = stats.projectile_scene.instantiate()
-		if projectile_instance is Area3D and projectile_instance.has_method('set_stats'):
-			projectile_instance.set_stats(projectile_stats) # Assign current stats
+		# --- FIX START ---
+		# Check if it's the correct type and has the necessary methods/script
+		if projectile_instance is Area3D and projectile_instance.has_method("set_stats") and projectile_instance.has_method("pool_reset"):
 			projectile_instance.owner_tower = self
+			projectile_instance.set_stats(projectile_stats) # Use the method
+			# print_debug("Instantiated fallback projectile.") # Optional debug
+		# --- FIX END ---
 		else:
 			printerr("Fallback projectile instance is invalid!")
 			if is_instance_valid(projectile_instance): projectile_instance.queue_free()
-			return
+			return # Don't proceed if fallback failed
 
-	# --- Configure and Launch ---
-	look_at(target.global_position, Vector3.UP)
+	# Ensure projectile instance is valid before proceeding
+	if not is_instance_valid(projectile_instance):
+		printerr("Attack failed: Projectile instance became invalid.")
+		# Attempt to return it to pool if possible? Or just log error.
+		return
 
+	# --- Aim and Position ---
+	# Ensure target is still valid before looking at it
+	if not is_instance_valid(target):
+		printerr("Attack cancelled: Target became invalid before firing.")
+		# Return projectile to pool without firing
+		_return_projectile_to_pool(projectile_instance)
+		return
+
+	look_at(target.global_position, Vector3.UP) # Aim the tower
+	# Add projectile to the main scene tree (or a dedicated projectiles node)
 	get_tree().root.add_child(projectile_instance)
+	# Set projectile's position/rotation *after* adding to tree
 	projectile_instance.global_transform = projectile_spawn_point.global_transform
 
-	if projectile_instance.has_method("set_target"): projectile_instance.set_target(target)
-	elif projectile_instance.has_method("initialize_direction"): projectile_instance.initialize_direction(projectile_instance.global_transform.basis.z)
+	# --- Configure and Activate Projectile ---
+	# Set target for homing projectiles
+	if projectile_instance.has_method("set_target"):
+		projectile_instance.set_target(target)
+	# Set initial direction for non-homing
+	elif projectile_instance.has_method("initialize_direction"):
+		# Use the projectile's forward direction after being placed
+		projectile_instance.initialize_direction(projectile_instance.global_transform.basis.z)
 
-	if projectile_instance.has_method("activate"): projectile_instance.activate()
+	# Activate the projectile (e.g., start its lifetime timer)
+	if projectile_instance.has_method("activate"):
+		projectile_instance.activate()
+	else:
+		printerr("Projectile %s missing activate() method!" % projectile_instance.name)
 
+	# --- Start Cooldown ---
 	cooldown_timer.start()
+	# print_debug("Tower fired! Cooldown started.") # Optional debug
 
 
-# Called by projectiles when they finish
 func _return_projectile_to_pool(projectile: Node):
-	# ... (no changes needed here) ...
 	if not is_instance_valid(projectile):
-		printerr("Tower %s received invalid projectile to return." % name)
+		# print_debug("Attempted to return invalid projectile to pool.") # Optional debug
 		return
-	_projectile_pool.append(projectile)
+	# Check if it's already in the pool to prevent duplicates
+	if not projectile in _projectile_pool:
+		_projectile_pool.append(projectile)
+		# print_debug("Returned projectile %s to pool. Pool size: %d" % [projectile.name, _projectile_pool.size()]) # Optional debug
+	# else: print_debug("Projectile %s already in pool?" % projectile.name) # Optional debug
 
 
 func _on_range_area_entered(area: Area3D):
-	# ... (no changes needed here) ...
-	if not stats: return
+	print('yyy')
+	if not stats: return # Tower not configured
 	var parent_node = area.get_parent()
-	if not (is_instance_valid(parent_node) and parent_node.is_in_group("bloons")): return
-	var bloon_stats: BloonStats = null
-	if parent_node.has_method("get"): bloon_stats = parent_node.stats
-	if not bloon_stats : return
-	if bloon_stats.is_camo and not stats.can_see_camo: return
+
+	# Check if it's a valid bloon node entering
+	if not (is_instance_valid(parent_node) and parent_node.is_in_group("bloons")):
+		return
+
+	# Check if it has stats (might be redundant with group check but safe)
+	if not parent_node.has_method("get") or parent_node.get("stats") == null:
+		return
+
+	var bloon_stats: BloonStats = parent_node.stats
+
+	# Check for camo if necessary
+	if bloon_stats.is_camo and not stats.can_see_camo:
+		return # Ignore camo bloons if tower can't see them
+
+	# Add to list if not already present
 	if not parent_node in targets_in_range:
 		targets_in_range.append(parent_node)
+		# print_debug("Bloon entered range: %s. Targets: %d" % [parent_node.name, targets_in_range.size()]) # Optional debug
 
 
 func _on_range_area_exited(area: Area3D):
-	# ... (no changes needed here) ...
 	var parent_node = area.get_parent()
+	# Remove if it exists in the list
 	if parent_node in targets_in_range:
 		targets_in_range.erase(parent_node)
+		# print_debug("Bloon exited range: %s. Targets: %d" % [parent_node.name, targets_in_range.size()]) # Optional debug
 
 
-# Function called when the cooldown timer finishes
 func _on_cooldown_timer_timeout():
-	# ... (no changes needed here) ...
+	# This function simply allows the timer's `is_stopped()` check to become true again.
+	# No action needed here unless you want to trigger something specific on cooldown end.
+	# print_debug("Cooldown finished.") # Optional debug
 	pass
 
 
-# Optional: Clean up pooled nodes when the tower is freed
 func _exit_tree():
-	# ... (no changes needed here) ...
+	# Clean up projectiles when the tower is removed
+	# print_debug("Tower %s exiting tree. Cleaning up %d pooled projectiles." % [name, _projectile_pool.size()]) # Optional debug
 	for proj in _projectile_pool:
 		if is_instance_valid(proj):
-			proj.queue_free()
+			# If the projectile is parented to root, free it directly
+			if proj.get_parent() == get_tree().root:
+				proj.queue_free()
+			# Otherwise, let normal cleanup handle it (or free if necessary)
 	_projectile_pool.clear()
+	targets_in_range.clear() # Clear target list too
 
+# --- NEW: Upgrade Logic ---
 
-# --- NEW FUNCTIONS ---
+func get_upgrade_level(path_index: int) -> int:
+	if path_index >= 1 and path_index <= 3:
+		return upgrade_levels[path_index - 1]
+	return -1 # Invalid path
 
-## Called by Main.gd after instantiating the tower.
-func set_initial_state(p_tower_name: String, p_base_cost: int):
-	tower_name = p_tower_name
-	upgrade_path = "000"
-	total_spent = p_base_cost
-	# Name the node in the scene tree for easier debugging (optional)
-	name = "%s_%s" % [tower_name.capitalize(), upgrade_path]
+func get_upgrade_path_string() -> String:
+	return "%d%d%d" % [upgrade_levels[0], upgrade_levels[1], upgrade_levels[2]]
 
+# Basic BTD6 path locking: Cannot have more than 2 paths with tier >= 3,
+# and cannot have tiers like 3-3-0, 0-3-3, 3-0-3, etc. Only one path can go past tier 2 if another is already tier 3+.
+# Or more simply: Sum of tiers on other paths cannot exceed 2 if this path goes to tier 3+.
+func is_path_locked(path_index_to_check: int) -> bool:
+	if path_index_to_check < 1 or path_index_to_check > 3: return true # Invalid path is locked
 
-## Applies an upgrade based on path index and tier. Called by Main.gd.
-func apply_upgrade(path_index: int, tier: int, cost: int) -> bool:
-	if path_index < 1 or path_index > 3 or tier <= 0:
-		printerr("Tower %s: Invalid path/tier for upgrade: %d/%d" % [name, path_index, tier])
-		return false
+	var current_tier = upgrade_levels[path_index_to_check - 1]
+	if current_tier >= 5: return true # Already max tier
 
-	# --- Basic Upgrade Path Validation ---
-	var path_array = [int(upgrade_path[0]), int(upgrade_path[1]), int(upgrade_path[2])]
+	# Check BTD6 cross-pathing rules (simplified)
+	# If you want to upgrade path X beyond tier 2 (i.e., to tier 3, 4, or 5)
+	# the sum of the tiers of the *other two* paths cannot exceed 2.
+	if current_tier >= 2: # If we are considering upgrading to tier 3 or higher
+		var other_path1_idx = -1
+		var other_path2_idx = -1
+		# Determine the indices of the *other* two paths (0-based)
+		match path_index_to_check:
+			1: # Checking path 1, others are 2 (idx 1) and 3 (idx 2)
+				other_path1_idx = 1
+				other_path2_idx = 2
+			2: # Checking path 2, others are 1 (idx 0) and 3 (idx 2)
+				other_path1_idx = 0
+				other_path2_idx = 2
+			3: # Checking path 3, others are 1 (idx 0) and 2 (idx 1)
+				other_path1_idx = 0
+				other_path2_idx = 1
 
-	# 1. Check if the requested tier is the next one for the path
-	if path_array[path_index - 1] != tier - 1:
-		printerr("Tower %s: Cannot apply tier %d for path %d. Current tier is %d." % [name, tier, path_index, path_array[path_index - 1]])
-		return false
+		if other_path1_idx != -1 and other_path2_idx != -1:
+			var other_path1_tier = upgrade_levels[other_path1_idx]
+			var other_path2_tier = upgrade_levels[other_path2_idx]
 
-	# 2. BTD6 Rule: Cannot have more than 2 paths upgraded past tier 2.
-	# 3. BTD6 Rule: Cannot upgrade a path to tier 3+ if another path is already tier 3+. (Cross-pathing limit)
-	var tier3plus_paths = 0
-	for i in range(3):
-		if path_array[i] >= 3:
-			tier3plus_paths += 1
+			if other_path1_tier + other_path2_tier > 2:
+				# print_debug("Path %d locked: Other paths (%d, %d) sum to %d > 2" % [path_index_to_check, other_path1_tier, other_path2_tier, other_path1_tier + other_path2_tier])
+				return true
 
-	if tier >= 3:
-		# Check if trying to make a second path tier 3+
-		if tier3plus_paths > 0 and path_array[path_index - 1] < 3:
-			printerr("Tower %s: Cannot upgrade path %d to tier 3+. Another path is already tier 3+." % [name, path_index])
-			return false
-		# Check if trying to upgrade a path beyond tier 2 when two *other* paths are already tier 2
-		var tier2_paths = 0
+	# Also, a path cannot be upgraded if it's already tier 2 and another path is tier 3+
+	# This rule prevents paths like 3-2-2 or 2-3-2.
+	if current_tier == 2:
 		for i in range(3):
-			if i != path_index - 1 and path_array[i] >= 2:
-				tier2_paths += 1
-		if tier2_paths >= 2:
-			printerr("Tower %s: Cannot upgrade path %d past tier 2. Two other paths are already tier 2+." % [name, path_index])
-			return false
+			# Check if *another* path (not the one we're checking) is already tier 3 or higher
+			if i != (path_index_to_check - 1) and upgrade_levels[i] >= 3:
+				# print_debug("Path %d locked: Cannot upgrade path to tier 3+ because path %d is already tier %d" % [path_index_to_check, i+1, upgrade_levels[i]])
+				return true
+
+	return false
 
 
-	# --- Construct New Path String ---
-	path_array[path_index - 1] = tier
-	var new_upgrade_path = "%d%d%d" % [path_array[0], path_array[1], path_array[2]]
-
-	print("Tower %s: Attempting upgrade from %s to %s" % [name, upgrade_path, new_upgrade_path])
-
-	# --- Get New Stats from Factory ---
-	var new_stats_dict = TowerFactory.create_stats(tower_name, new_upgrade_path)
-	if not new_stats_dict or not new_stats_dict.has("tower") or not new_stats_dict.has("projectile"):
-		printerr("Tower %s: Failed to get new stats from TowerFactory for path %s" % [name, new_upgrade_path])
+func apply_upgrade(path_index: int, tier: int, cost: int) -> bool:
+	# --- Validation ---
+	if path_index < 1 or path_index > 3:
+		printerr("ApplyUpgrade: Invalid path index ", path_index)
+		return false
+	# Ensure we are upgrading to the *next* tier sequentially
+	if tier != upgrade_levels[path_index - 1] + 1:
+		printerr("ApplyUpgrade: Invalid tier %d for path %d (current is %d)" % [tier, path_index, upgrade_levels[path_index - 1]])
+		return false
+	if is_path_locked(path_index):
+		printerr("ApplyUpgrade: Path %d is locked." % path_index)
+		return false
+	if tier > 5:
+		printerr("ApplyUpgrade: Tier %d exceeds max." % tier)
 		return false
 
-	# --- Apply New Stats ---
-	self.stats = new_stats_dict.tower
-	self.projectile_stats = new_stats_dict.projectile # CRITICAL: Update projectile stats too
+	# --- Get New Stats ---
+	# Create a temporary copy of levels to generate the next path string
+	var next_upgrade_levels = upgrade_levels.duplicate()
+	next_upgrade_levels[path_index - 1] = tier
+	var next_upgrade_path_str = "%d%d%d" % [next_upgrade_levels[0], next_upgrade_levels[1], next_upgrade_levels[2]]
 
-	# --- Update Internal State ---
-	self.upgrade_path = new_upgrade_path
-	self.total_spent += cost
-	self.name = "%s_%s" % [tower_name.capitalize(), upgrade_path] # Update node name (optional)
+	var new_stats_dict = TowerFactory.create_stats(tower_name, next_upgrade_path_str)
+	if not new_stats_dict or not new_stats_dict.has("tower") or not new_stats_dict.has("projectile"):
+		printerr("ApplyUpgrade: Failed to get new stats from factory for %s path %s" % [tower_name, next_upgrade_path_str])
+		return false
 
-	# --- Reconfigure Tower Visuals/Behavior ---
-	# Use call_deferred to avoid issues if called during physics process or signal handling
-	call_deferred("_configure_tower")
-	# Re-initialize projectile pool as stats (especially projectile stats) have changed
-	call_deferred("_initialize_projectile_pool")
+	# --- Apply Changes ---
+	print("Applying upgrade %s to tower %s" % [next_upgrade_path_str, name])
+	self.stats = new_stats_dict.tower # Apply new tower stats
+	self.projectile_stats = new_stats_dict.projectile # Apply new projectile stats
+	upgrade_levels[path_index - 1] = tier # Update internal level tracking *after* success
+	total_spent += cost
 
-	print("Tower %s: Upgrade successful to %s. Total spent: %d" % [name, upgrade_path, total_spent])
+	# Reconfigure visuals, range, cooldown based on new TowerStats
+	_configure_tower()
+	# Re-initialize the projectile pool with new ProjectileStats (clears old, creates new)
+	_initialize_projectile_pool()
+
+	# Optional: Force a target re-evaluation if range/camo changed significantly
+	# targets_in_range.clear() # Or re-check existing targets
+
 	return true

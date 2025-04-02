@@ -25,6 +25,10 @@ TowerFactory="*res://autoloads/tower_factory.gd"
 
 enabled=PackedStringArray("res://addons/AI-Context-Generator/plugin.cfg")
 
+[global_group]
+
+towers=""
+
 [layer_names]
 
 3d_physics/layer_1="Bloons"
