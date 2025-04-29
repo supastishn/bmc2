@@ -32,23 +32,16 @@ func _ready():
 # Called by NodePoolManager when reusing the node
 func pool_reset():
 	is_released = false # Reset release flag
-	if not stats:
-		printerr("Bloon %s trying to reset without stats!" % name)
-		# release_to_pool() # Or maybe this?
-		return
+	# Stats and health are now set by initialize_with_stats
 
-	# Reset internal state
-	current_health = stats.health
-	max_health = stats.health # Store the original health
 	progress = 0.0 # Reset position on path
-	# Parent/Position/Rotation are handled by the WaveManager adding it to Path3D
 	visible = true # Ensure it's visible if hidden on release
 
 	# Stop regrow timer initially
 	if regrow_timer:
 		regrow_timer.stop()
 
-	# Ensure physics process is enabled
+	# Ensure physics process is enabled (will be started in _physics_process if needed)
 
 	# Ensure physics process is enabled
 	set_physics_process(true)
@@ -58,6 +51,22 @@ func _physics_process(delta):
 	if not stats or is_released: return
 
 	progress += stats.speed * delta
+	# Must be slightly below 1
+	if progress_ratio >= 0.99: # Changed threshold to be closer to end
+		handle_reached_end()
+
+
+# --- NEW: Called by WaveManager after getting node from pool ---
+func initialize_with_stats(new_stats: BloonStats):
+	if not new_stats:
+		printerr("Bloon %s received null stats during initialization!" % name)
+		release_to_pool() # Release it back if stats are invalid
+		return
+
+	stats = new_stats
+	current_health = stats.health
+	max_health = stats.health # Store the original health
+	# TODO: Optionally update mesh/material based on stats here if needed
 	# Must be slightly below 1
 	if progress_ratio >= 0.99: # Changed threshold to be closer to end
 		handle_reached_end()

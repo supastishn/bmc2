@@ -427,10 +427,16 @@ func spawn_bloon(bloon_stats_resource: BloonStats, p_progress_ratio: float = 0.0
 	# print_debug("Spawned bloon, active count: ", active_bloons_in_current_round)
 
 	# --- Add to Scene and Configure ---
-	# Assign stats directly. The pool_reset should handle applying them internally if needed.
-	bloon_instance.stats = bloon_stats_resource
+	# NEW: Initialize the bloon with the correct stats using the dedicated method
+	if bloon_instance.has_method("initialize_with_stats"):
+		bloon_instance.initialize_with_stats(bloon_stats_resource)
+	else:
+		printerr("Bloon instance %s is missing initialize_with_stats method!" % bloon_instance.name)
+		# Handle error: Free the instance and decrement count
+		if is_instance_valid(bloon_instance): bloon_instance.queue_free()
+		active_bloons_in_current_round -=1
+		return
 
-	path_node.add_child(bloon_instance)
 	# --- NEW: Set progress ratio for children ---
 	if p_progress_ratio > 0.0 and bloon_instance is PathFollow3D:
 		bloon_instance.progress_ratio = p_progress_ratio
@@ -441,6 +447,9 @@ func spawn_bloon(bloon_stats_resource: BloonStats, p_progress_ratio: float = 0.0
 	# --- NEW: Connect bloon removal signal ---
 	if not bloon_instance.bloon_removed_from_play.is_connected(_on_bloon_removed):
 		bloon_instance.bloon_removed_from_play.connect(_on_bloon_removed)
+
+	# Add to scene *after* initialization
+	path_node.add_child(bloon_instance)
 
 	# The bloon's pool_reset() should handle setting progress to 0.
 	# No further setup needed here unless you have wave-specific modifications.
