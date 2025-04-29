@@ -1495,3 +1495,165 @@
 
 # 2025-04-29 14:00:49.918641
 +/git add .
+
+# 2025-04-29 15:42:58.319669
++make functions in the wave_manager for each type of btd6 bloon, from red to a bad. make the functions return correct bloon stats for each bloon. don't use .tres files, just use functions in the wave manager.
+
+# 2025-04-29 15:45:49.753479
++n
+
+# 2025-04-29 15:46:16.582010
++when using BloonStats.new, you cannot use 'argument=value'. you must define every single argument of the bloon in its specific order.
+
+# 2025-04-29 15:46:36.721987
++when using BloonStats.new, you cannot use 'argument=value'. you must define every single argument of the bloon in its specific order. if it is unused, simply use default vakue
+
+# 2025-04-29 15:47:56.037309
++bloonStats.new only has seven arguments. if you want to add properties, add them to the bloon resource script
+
+# 2025-04-29 15:49:05.564560
++wave index is not declare at line 44 in wave manager
+
+# 2025-04-29 15:51:13.819395
++yyy
++  ERROR: Path node not set in WaveManager!
++  ERROR: Bloon Bloon trying to reset without stats!
++  ERROR: Bloon instance is missing set_stats method!
++.
+
+# 2025-04-29 15:52:37.744510
++the round is not incremented after all bloons are destroyed.
+
+# 2025-04-29 15:56:03.337424
++make the rounds match what bloons it has:
++    "r123": "8 Fortified ZOMGs, 200 MOABs",
++    "r124": "75 Fortified BFBs",
++    "r125": "21 ZOMGs, 42 BFBs, 63 MOABs",
++    "r126": "1 Fortified Camo Regrow Lead, 99 DDTs",
++    "r127": "48 MOABs, 24 BFBs",
++    "r128": "39 Fortified DDTs, 200 Fortified Camo Ceramics, 30 BFBs",
++    "r129": "7 Fortified ZOMGs, 77 Fortified Camo Leads, 77 Camo Purples, 77 Camo Ceramics, 7 ZOMGs, 18 DDTs",
++    "r130": "84 MOABs, 66 Fortified MOABs, 48 DDTs, 6 Fortified DDTs",
++    "r131": "18 Fortified ZOMGs",
++    "r132": "18 ZOMGs, 6 Fortified ZOMGs, 200 Camo Purples",
++    "r133": "12 Fortified MOABs, 12 Fortified BFBs, 4 Fortified ZOMGs, 27 MOABs, 27 BFBs, 9 ZOMGs",
++    "r134": "12 Fortified BFBs, 28 BFBs",
++    "r135": "14 Fortified ZOMGs, 21 Fortified DDTs",
++    "r136": "96 Fortified MOABs, 24 BFBs",
++    "r137": "18 ZOMGs, 24 BFBs, 48 MOABs",
++    "r138": "81 Fortified DDTs, 45 DDTs",
++    "r139": "181 MOABs, 72 Fortified MOABs",
++    "r140": "1 Fortified BAD, 1 BAD",
+
+# 2025-04-29 15:57:21.050997
++add the definitions from round 1 to 140
+
+# 2025-04-29 16:09:19.717022
++add data from rounds 50 through 122.
++    "r123": "8 Fortified ZOMGs, 200 MOABs",
++    "r124": "75 Fortified BFBs",
++    "r125": "21 ZOMGs, 42 BFBs, 63 MOABs",
++    "r126": "1 Fortified Camo Regrow Lead, 99 DDTs",
++    "r127": "48 MOABs, 24 BFBs",
++    "r128": "39 Fortified DDTs, 200 Fortified Camo Ceramics, 30 BFBs",
++    "r129": "7 Fortified ZOMGs, 77 Fortified Camo Leads, 77 Camo Purples, 77 Camo Ceramics, 7 ZOMGs, 18 DDTs",
++    "r130": "84 MOABs, 66 Fortified MOABs, 48 DDTs, 6 Fortified DDTs",
++    "r131": "18 Fortified ZOMGs",
++    "r132": "18 ZOMGs, 6 Fortified ZOMGs, 200 Camo Purples",
++    "r133": "12 Fortified MOABs, 12 Fortified BFBs, 4 Fortified ZOMGs, 27 MOABs, 27 BFBs, 9 ZOMGs",
++    "r134": "12 Fortified BFBs, 28 BFBs",
++    "r135": "14 Fortified ZOMGs, 21 Fortified DDTs",
++    "r136": "96 Fortified MOABs, 24 BFBs",
++    "r137": "18 ZOMGs, 24 BFBs, 48 MOABs",
++    "r138": "81 Fortified DDTs, 45 DDTs",
++    "r139": "181 MOABs, 72 Fortified MOABs",
++    "r140": "1 Fortified BAD, 1 BAD",
+
+# 2025-04-29 16:11:42.094353
++instead of using waves on a timer system, make it so thwt waves are advanced when all bloons of a wave have bren spound
+
+# 2025-04-29 16:11:52.930348
++instead of using waves on a timer system, make it so thwt waves are advanced when all bloons of a wave have bren spawned
+
+# 2025-04-29 16:12:49.639220
++remove wave manager from the main.tscn, just have eveeything use the wave manager autoload
+
+# 2025-04-29 16:13:26.884277
++/clear
+
+# 2025-04-29 16:13:31.684349
++/tokens
+
+# 2025-04-29 16:14:15.341189
++parse error on line 10 of main.tscn
+
+# 2025-04-29 16:15:13.809393
++path node not set in wavemanager, can you have it set by main.gd?
+
+# 2025-04-29 16:17:57.891910
++the balloons can all be destroyed in 1 dart regardless of its health
+
+# 2025-04-29 16:21:41.400811
++make it print origijal bloon health, then new bloom hewlth
+
+# 2025-04-29 16:53:06.064464
++it always says its red bloon, even if the round has blue bloons
+
+# 2025-04-29 17:04:26.094373
++it seems that, once the stats of a bloon are set, the health is not updated to the maximum, as blue bloons show 1 health.
+
+# 2025-04-29 17:05:18.357772
++initialized bloon blue with health: 1 from stats: 1
+
+# 2025-04-29 17:05:41.127075
++they are not popping into reds
+
+# 2025-04-29 17:07:09.545003
++they are popping into reds, ut the red bloon starts at the begnning of the track, not where the bloon used to be.
+
+# 2025-04-29 17:08:19.147021
++E 0:00:06:713   wave_manager.gd:442 @ spawn_bloon(): Can only set progress ratio on a PathFollow3D that is the child of a Path3D which is itself part of the scene tree.
++  <C++ Error>   Parameter "path" is null.
++  <C++ Source>  scene/3d/path_3d.cpp:453 @ set_progress_ratio()
++  <Stack Trace> wave_manager.gd:442 @ spawn_bloon()
++                wave_manager.gd:477 @ _on_bloon_spawn_children()
++                bloon.gd:120 @ handle_pop()
++                bloon.gd:95 @ take_damage()
++                projectile.gd:152 @ _on_area_entered()
++
+
+# 2025-04-29 17:09:30.037972
++now what's happening is that the new bloon gets instantly popped. make children have immunity to the projectile that the parent was killed from.
+
+# 2025-04-29 17:14:58.940471
++source projectile that popped me varib=able doesnt exist
+
+# 2025-04-29 17:40:51.751248
++the red bloon is still being killed instantly, make the children immune to the projectile thst killed parent cause it seems it doesnt work. also, make sorce projectile that popped me stored as an array
+
+# 2025-04-29 17:45:22.938547
++make it print the projectile that killed it and the projectiles that it is immune to for debugging
+
+# 2025-04-29 17:48:08.386092
++its saying immune to: []
+
+# 2025-04-29 18:24:02.051761
++make the immunity last forever, not just one frame.
+
+# 2025-04-29 18:26:14.628338
++/add resources/red_bloon.tscn
+
+# 2025-04-29 18:26:16.718140
++n
+
+# 2025-04-29 18:26:20.180308
++/add resources/red_bloon.tres
+
+# 2025-04-29 18:26:24.453533
++n
+
+# 2025-04-29 18:26:27.629736
++/add resources
+
+# 2025-04-29 18:26:31.771846
++/git add .

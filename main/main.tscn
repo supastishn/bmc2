@@ -1,10 +1,9 @@
-[gd_scene load_steps=9 format=3 uid="uid://dvojqgv3varqy"]
+[gd_scene load_steps=8 format=3 uid="uid://dvojqgv3varqy"]
 
 [ext_resource type="Script" uid="uid://i2lxdnv61pku" path="res://main/main.gd" id="1_67ri8"]
 [ext_resource type="PackedScene" uid="uid://30l774cnywje" path="res://ground/ground.tscn" id="1_xwkvk"]
 [ext_resource type="PackedScene" uid="uid://bbgtd6k2hdso3" path="res://path/Level.tscn" id="3_3wy1v"]
 [ext_resource type="PackedScene" uid="uid://4e728yqgfrlm" path="res://gui/game.tscn" id="6_kfbq2"]
-
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_rxg2q"]
 
@@ -31,7 +30,8 @@ current = true
 
 [node name="Ground" parent="." instance=ExtResource("1_xwkvk")]
 
-[node name="WaveManager" type="Node" parent="." node_paths=PackedStringArray("path_node")]
+[node name="WaveManager" type="Node" parent="."]
+
 [node name="Level" parent="." instance=ExtResource("3_3wy1v")]
 
 [node name="Game" parent="." instance=ExtResource("6_kfbq2")]

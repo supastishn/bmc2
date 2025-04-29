@@ -9,6 +9,13 @@ script = ExtResource("2_3fjlj")
 attack_cooldown = 1.0
 range = 2.0
 can_see_camo = false
+projectiles_per_shot = 1
+spread_angle = 0.0
+ability_name = ""
+ability_description = ""
+ability_cooldown = 0.0
+ability_duration = 0.0
+ability_initial_cooldown = 0.0
 metadata/_custom_type_script = "uid://xk5g8hgbosn6"
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_hnvwg"]

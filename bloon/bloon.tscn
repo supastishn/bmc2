@@ -9,6 +9,7 @@ albedo_color = Color(1, 0, 0, 1)
 material = SubResource("StandardMaterial3D_c2y1y")
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_c2y1y"]
+
 [node name="Bloon" type="PathFollow3D" groups=["bloons"]]
 script = ExtResource("1_jpjj7")
 

@@ -20,6 +20,7 @@ config/icon="res://icon.svg"
 GameManager="*res://autoloads/game_manager.gd"
 NodePoolManager="*res://autoloads/pool_manager.gd"
 TowerFactory="*res://autoloads/tower_factory.gd"
+WaveManager="*res://main/wave_manager.gd"
 
 [editor_plugins]
 
