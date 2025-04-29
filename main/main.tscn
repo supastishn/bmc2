@@ -37,8 +37,6 @@ path_node = NodePath("../Level")
 
 [node name="SpawnTimer" type="Timer" parent="WaveManager"]
 
-[node name="WaveTimer" type="Timer" parent="WaveManager"]
-
 [node name="Level" parent="." instance=ExtResource("3_3wy1v")]
 
 [node name="Game" parent="." instance=ExtResource("6_kfbq2")]

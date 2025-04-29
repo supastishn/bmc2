@@ -8,7 +8,7 @@ const BLOON_STATS_SCRIPT = preload("res://stats/bloon_stats.gd")
 @export var path_node: Path3D # Assign your Path3D node here
 
 @onready var spawn_timer: Timer = $SpawnTimer
-@onready var wave_timer: Timer = $WaveTimer
+#@onready var wave_timer: Timer = $WaveTimer # Removed - waves advance immediately after spawning finishes
 
 var current_wave_data = []
 var current_wave_index = 0
@@ -26,10 +26,6 @@ func _ready():
 	if not spawn_timer: spawn_timer = Timer.new(); spawn_timer.name = "SpawnTimer"; add_child(spawn_timer)
 	spawn_timer.one_shot = true # Spawn one bloon per timeout
 	if not spawn_timer.timeout.is_connected(_on_spawn_timer_timeout): spawn_timer.timeout.connect(_on_spawn_timer_timeout)
-
-	if not wave_timer: wave_timer = Timer.new(); wave_timer.name = "WaveTimer"; add_child(wave_timer)
-	wave_timer.wait_time = 5.0; wave_timer.one_shot = true # Time between waves
-	if not wave_timer.timeout.is_connected(start_next_wave): wave_timer.timeout.connect(start_next_wave)
 
 	# Wave Data Structure using stats functions
 	# 0-indexed array, where index `i` corresponds to round `i+1`
@@ -346,6 +342,8 @@ func _ready():
 
 
 func start_next_wave():
+	# --- Advance Round Number ---
+	GameManager.advance_round() # Advance round counter for the wave *about* to start
 	# Adjust wave starting logic if necessary - assuming current_wave_index maps 0-based
 	print("Attempting to start wave for index: ", current_wave_index)
 	if current_wave_index >= len(current_wave_data):
@@ -376,10 +374,11 @@ func _on_spawn_timer_timeout():
 	# Check if spawning for the current wave is actually finished
 	if current_bloon_spawn_index >= bloons_in_wave.size():
 		if not spawning_complete_for_current_round: # Only set flag once
-			spawning_complete_for_current_round = true
 			print("Wave ", current_wave_index + 1, " spawning finished.")
-			_check_round_end() # Check if round ended exactly when spawning finished
-		return
+			spawning_complete_for_current_round = true
+			current_wave_index += 1 # Increment for the next wave
+			start_next_wave() # Immediately trigger the next wave setup
+		return # Stop spawning for this iteration
 
 	# Spawn the next bloon in the list
 	var bloon_info = bloons_in_wave[current_bloon_spawn_index]
@@ -393,9 +392,12 @@ func _on_spawn_timer_timeout():
 		spawn_timer.wait_time = bloon_info["delay"] # Use delay from the bloon just spawned
 		spawn_timer.start()
 	else:
-		# This was the last bloon spawned, mark spawning as complete and check round end
+		# This was the last bloon for this wave.
+		# Mark spawning as complete, increment index, and trigger the next wave start immediately.
+		print("Wave ", current_wave_index + 1, " spawning finished (last bloon).")
 		spawning_complete_for_current_round = true
-		spawn_timer.start()
+		current_wave_index += 1
+		start_next_wave()
 
 
 	# This else block might be redundant now due to the check at the start
@@ -448,16 +450,16 @@ func _on_bloon_removed():
 	if active_bloons_in_current_round > 0:
 		active_bloons_in_current_round -= 1
 		# print_debug("Bloon removed, active count: ", active_bloons_in_current_round)
-		_check_round_end()
+		_check_round_clear() # Check if the field is now clear
 	# else: print_debug("Bloon removed, but active count was already 0?") # Should not happen ideally
 
 # --- NEW: Check if the Round Should End ---
-func _check_round_end():
-	# Round ends if spawning is complete AND no active bloons remain
+# --- RENAMED: Check if the Round *field* is clear ---
+func _check_round_clear():
+	# Field is clear if spawning is complete AND no active bloons remain
 	if spawning_complete_for_current_round and active_bloons_in_current_round == 0:
 		print("All bloons cleared for wave ", current_wave_index + 1)
-		GameManager.advance_round() # Tell GameManager round is over
-		wave_timer.start() # Start timer for the *next* wave
+		# No longer advances round or starts timer here
 
 # --- NEW: Child Spawning Handler ---
 func _on_bloon_spawn_children(children_stats_array: Array, spawn_progress_ratio: float):
