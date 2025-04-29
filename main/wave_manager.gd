@@ -438,7 +438,7 @@ func spawn_bloon(bloon_stats_resource: BloonStats, p_progress_ratio: float = 0.0
 		return
 
 	# --- NEW: Set progress ratio for children ---
-	if p_progress_ratio > 0.0 and bloon_instance is PathFollow3D:
+	if bloon_instance is PathFollow3D: # REMOVED: p_progress_ratio > 0.0 check
 		bloon_instance.progress_ratio = p_progress_ratio
 
 	# --- NEW: Connect child spawning signal ---
