@@ -5,7 +5,7 @@ extends Node
 @export var base_bloon_scene: PackedScene = preload("res://bloon/bloon.tscn")
 const BLOON_STATS_SCRIPT = preload("res://stats/bloon_stats.gd")
 
-@export var path_node: Path3D # Assign your Path3D node here
+var path_node: Path3D # This will be set by main.gd
 
 @onready var spawn_timer: Timer = $SpawnTimer
 #@onready var wave_timer: Timer = $WaveTimer # Removed - waves advance immediately after spawning finishes

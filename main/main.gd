@@ -12,6 +12,7 @@ extends Node3D
 @onready var camera: Camera3D = $Camera3D
 # REMOVED @onready var wave_manager: Node = $WaveManager - Using autoload now
 @onready var towers_node: Node3D = $Towers
+@onready var path_node: Path3D = $Level # <<< ADDED Reference to the Path3D node
 
 # --- Placement State Variables ---
 var is_placing_tower: bool = false
@@ -48,6 +49,9 @@ const WORLD_CLICK_MASK = PLACED_TOWER_MASK | PLACEABLE_GROUND_MASK | (1 << (TRAC
 
 
 func _ready():
+	# --- Assign Path Node to WaveManager ---
+	WaveManager.path_node = path_node # <<< ADDED Assignment
+
 	# --- Connect Tower Placement GUI Signal ---
 	if tower_placement_gui:
 		if not tower_placement_gui.tower_selected_for_placement.is_connected(_on_tower_selected_for_placement):
