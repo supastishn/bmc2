@@ -18,8 +18,8 @@ var is_released := false # Flag to prevent double-release
 const REGROW_DELAY = 2.0
 # How often the bloon regrows one layer
 # --- Spawn Immunity ---
-var _immune_to_this_projectile: Object = null # Projectile instance to ignore temporarily
 const REGROW_INTERVAL = 1.0
+var _immune_to_projectiles: Array[Object] = [] # Projectiles to ignore temporarily
 
 func _ready():
 	# Don't initialize health here if it's reset in pool_reset
@@ -71,9 +71,11 @@ func initialize_with_stats(new_stats: BloonStats, immune_to_projectile: Object =
 	max_health = stats.health # Store the original health
 	# --- Debug: Confirm health initialization ---
 	# --- Set Temporary Spawn Immunity ---
-	_immune_to_this_projectile = immune_to_projectile
-	if _immune_to_this_projectile != null:
+	_immune_to_projectiles.clear() # Clear any previous immunity
+	if immune_to_projectile != null:
+		_immune_to_projectiles.append(immune_to_projectile)
 		_clear_spawn_immunity.call_deferred() # Clear immunity after this frame
+		# print_debug("Added immunity for %s against %s" % [stats.bloon_type if stats else "Unknown", immune_to_projectile]) # Debug
 
 	print("Initialized Bloon '%s' with health: %d (from stats: %d)" % [stats.bloon_type if stats else "Unknown", current_health, stats.health])
 	# TODO: Optionally update mesh/material based on stats here if needed
@@ -84,13 +86,13 @@ func initialize_with_stats(new_stats: BloonStats, immune_to_projectile: Object =
 
 # --- NEW: Clear Spawn Immunity ---
 func _clear_spawn_immunity():
-	# print_debug("Clearing spawn immunity for %s from projectile %s" % [stats.bloon_type if stats else "Unknown", _immune_to_this_projectile]) # Debug
-	_immune_to_this_projectile = null
+	# print_debug("Clearing spawn immunity list for %s (contained %d)" % [stats.bloon_type if stats else "Unknown", _immune_to_projectiles.size()]) # Debug
+	_immune_to_projectiles.clear()
 
 
 func take_damage(amount: int, source_projectile: Object = null): # ADDED source_projectile param
 	if not stats or is_released: return
-	if _immune_to_this_projectile != null and source_projectile == _immune_to_this_projectile:
+	if not _immune_to_projectiles.is_empty() and source_projectile in _immune_to_projectiles:
 		print("Bloon '%s' ignored damage from projectile %s due to spawn immunity." % [stats.bloon_type if stats else "Unknown", source_projectile]) # Debug
 		return # Ignore damage from the specific projectile it should be immune to
 
