@@ -41,7 +41,7 @@ func _ready():
 	start_next_wave()
 
 func start_next_wave():
-	if wave_index >= len(current_wave_data):
+	if current_wave_index >= len(current_wave_data): # Changed wave_index to current_wave_index
 		print("All waves finished!"); return
 	if current_wave_index >= len(current_wave_data):
 		print("All waves finished!")
@@ -267,4 +267,3 @@ func _get_bad_stats() -> BloonStats:
 	stats.moab_class = true
 	return stats
 #endregion
-
