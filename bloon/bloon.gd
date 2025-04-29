@@ -92,6 +92,10 @@ func _clear_spawn_immunity():
 
 func take_damage(amount: int, source_projectile: Object = null): # ADDED source_projectile param
 	if not stats or is_released: return
+
+	# --- Debug: Print incoming projectile and immunity list ---
+	print("Take Damage: Incoming projectile %s. Immune to: %s" % [source_projectile, _immune_to_projectiles])
+
 	if not _immune_to_projectiles.is_empty() and source_projectile in _immune_to_projectiles:
 		print("Bloon '%s' ignored damage from projectile %s due to spawn immunity." % [stats.bloon_type if stats else "Unknown", source_projectile]) # Debug
 		return # Ignore damage from the specific projectile it should be immune to
