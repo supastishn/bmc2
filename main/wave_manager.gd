@@ -31,21 +31,88 @@ func _ready():
 	wave_timer.wait_time = 5.0; wave_timer.one_shot = true # Time between waves
 	if not wave_timer.timeout.is_connected(start_next_wave): wave_timer.timeout.connect(start_next_wave)
 
-	# Example Wave Data Structure using stats functions
-	# List of waves, where each wave is a list of bloon groups
+	# Wave Data Structure using stats functions
+	# 0-indexed array, where index `i` corresponds to round `i+1`
 	current_wave_data = [
-		# Wave 1: 15 Red Bloons
-		[ {"stats_func": _get_red_stats, "count": 15, "delay": 0.8} ],
-		# Wave 2: 25 Blue Bloons
-		[ {"stats_func": _get_blue_stats, "count": 25, "delay": 0.4} ],
-		# Wave 3: 10 Red, 10 Blue
-		[ {"stats_func": _get_red_stats, "count": 10, "delay": 0.5}, {"stats_func": _get_blue_stats, "count": 10, "delay": 0.5} ]
+		# ... Add rounds 1 through 122 here if needed ...
+		# --- Placeholder for rounds 1-122 ---
+		# Using an empty array for simplicity now, you'd need to fill these in
+		[],[],[],[],[],[],[],[],[],[], # 1-10
+		[],[],[],[],[],[],[],[],[],[], # 11-20
+		[],[],[],[],[],[],[],[],[],[], # 21-30
+		[],[],[],[],[],[],[],[],[],[], # 31-40
+		[],[],[],[],[],[],[],[],[],[], # 41-50
+		[],[],[],[],[],[],[],[],[],[], # 51-60
+		[],[],[],[],[],[],[],[],[],[], # 61-70
+		[],[],[],[],[],[],[],[],[],[], # 71-80
+		[],[],[],[],[],[],[],[],[],[], # 81-90
+		[],[],[],[],[],[],[],[],[],[], # 91-100
+		[],[],[],[],[],[],[],[],[],[], # 101-110
+		[],[],[],[],[],[],[],[],[],[], # 111-120
+		[],[], # 121-122
+		# --- Rounds 123-140 ---
+		# Round 123 (index 122): 8 Fortified ZOMGs, 200 MOABs
+		[ {"stats_func": _get_fortified_zomg_stats, "count": 8, "delay": 1.0}, {"stats_func": _get_moab_stats, "count": 200, "delay": 0.1} ],
+		# Round 124 (index 123): 75 Fortified BFBs
+		[ {"stats_func": _get_fortified_bfb_stats, "count": 75, "delay": 0.2} ],
+		# Round 125 (index 124): 21 ZOMGs, 42 BFBs, 63 MOABs
+		[ {"stats_func": _get_zomg_stats, "count": 21, "delay": 0.8}, {"stats_func": _get_bfb_stats, "count": 42, "delay": 0.4}, {"stats_func": _get_moab_stats, "count": 63, "delay": 0.2} ],
+		# Round 126 (index 125): 1 Fortified Camo Regrow Lead, 99 DDTs
+		[ {"stats_func": _get_fortified_camo_regrow_lead_stats, "count": 1, "delay": 5.0}, {"stats_func": _get_ddt_stats, "count": 99, "delay": 0.1} ],
+		# Round 127 (index 126): 48 MOABs, 24 BFBs
+		[ {"stats_func": _get_moab_stats, "count": 48, "delay": 0.3}, {"stats_func": _get_bfb_stats, "count": 24, "delay": 0.6} ],
+		# Round 128 (index 127): 39 Fortified DDTs, 200 Fortified Camo Ceramics, 30 BFBs
+		[ {"stats_func": _get_fortified_ddt_stats, "count": 39, "delay": 0.4}, {"stats_func": _get_fortified_camo_ceramic_stats, "count": 200, "delay": 0.05}, {"stats_func": _get_bfb_stats, "count": 30, "delay": 0.8} ],
+		# Round 129 (index 128): 7 Fortified ZOMGs, 77 Fortified Camo Leads, 77 Camo Purples, 77 Camo Ceramics, 7 ZOMGs, 18 DDTs
+		[
+			{"stats_func": _get_fortified_zomg_stats, "count": 7, "delay": 2.0},
+			{"stats_func": _get_fortified_camo_lead_stats, "count": 77, "delay": 0.2},
+			{"stats_func": _get_camo_purple_stats, "count": 77, "delay": 0.2},
+			{"stats_func": _get_camo_ceramic_stats, "count": 77, "delay": 0.2},
+			{"stats_func": _get_zomg_stats, "count": 7, "delay": 2.0},
+			{"stats_func": _get_ddt_stats, "count": 18, "delay": 0.8},
+		],
+		# Round 130 (index 129): 84 MOABs, 66 Fortified MOABs, 48 DDTs, 6 Fortified DDTs
+		[
+			{"stats_func": _get_moab_stats, "count": 84, "delay": 0.15},
+			{"stats_func": _get_fortified_moab_stats, "count": 66, "delay": 0.2},
+			{"stats_func": _get_ddt_stats, "count": 48, "delay": 0.3},
+			{"stats_func": _get_fortified_ddt_stats, "count": 6, "delay": 1.0},
+		],
+		# Round 131 (index 130): 18 Fortified ZOMGs
+		[ {"stats_func": _get_fortified_zomg_stats, "count": 18, "delay": 0.9} ],
+		# Round 132 (index 131): 18 ZOMGs, 6 Fortified ZOMGs, 200 Camo Purples
+		[ {"stats_func": _get_zomg_stats, "count": 18, "delay": 0.9}, {"stats_func": _get_fortified_zomg_stats, "count": 6, "delay": 1.5}, {"stats_func": _get_camo_purple_stats, "count": 200, "delay": 0.05} ],
+		# Round 133 (index 132): 12 Fortified MOABs, 12 Fortified BFBs, 4 Fortified ZOMGs, 27 MOABs, 27 BFBs, 9 ZOMGs
+		[
+			{"stats_func": _get_fortified_moab_stats, "count": 12, "delay": 0.5},
+			{"stats_func": _get_fortified_bfb_stats, "count": 12, "delay": 0.8},
+			{"stats_func": _get_fortified_zomg_stats, "count": 4, "delay": 1.5},
+			{"stats_func": _get_moab_stats, "count": 27, "delay": 0.3},
+			{"stats_func": _get_bfb_stats, "count": 27, "delay": 0.6},
+			{"stats_func": _get_zomg_stats, "count": 9, "delay": 1.0},
+		],
+		# Round 134 (index 133): 12 Fortified BFBs, 28 BFBs
+		[ {"stats_func": _get_fortified_bfb_stats, "count": 12, "delay": 0.8}, {"stats_func": _get_bfb_stats, "count": 28, "delay": 0.5} ],
+		# Round 135 (index 134): 14 Fortified ZOMGs, 21 Fortified DDTs
+		[ {"stats_func": _get_fortified_zomg_stats, "count": 14, "delay": 1.0}, {"stats_func": _get_fortified_ddt_stats, "count": 21, "delay": 0.5} ],
+		# Round 136 (index 135): 96 Fortified MOABs, 24 BFBs
+		[ {"stats_func": _get_fortified_moab_stats, "count": 96, "delay": 0.1}, {"stats_func": _get_bfb_stats, "count": 24, "delay": 0.6} ],
+		# Round 137 (index 136): 18 ZOMGs, 24 BFBs, 48 MOABs
+		[ {"stats_func": _get_zomg_stats, "count": 18, "delay": 0.8}, {"stats_func": _get_bfb_stats, "count": 24, "delay": 0.6}, {"stats_func": _get_moab_stats, "count": 48, "delay": 0.3} ],
+		# Round 138 (index 137): 81 Fortified DDTs, 45 DDTs
+		[ {"stats_func": _get_fortified_ddt_stats, "count": 81, "delay": 0.15}, {"stats_func": _get_ddt_stats, "count": 45, "delay": 0.25} ],
+		# Round 139 (index 138): 181 MOABs, 72 Fortified MOABs
+		[ {"stats_func": _get_moab_stats, "count": 181, "delay": 0.05}, {"stats_func": _get_fortified_moab_stats, "count": 72, "delay": 0.1} ],
+		# Round 140 (index 139): 1 Fortified BAD, 1 BAD
+		[ {"stats_func": _get_fortified_bad_stats, "count": 1, "delay": 10.0}, {"stats_func": _get_bad_stats, "count": 1, "delay": 5.0} ],
 	]
 	start_next_wave()
 
+
 func start_next_wave():
-	if current_wave_index >= len(current_wave_data): # Changed wave_index to current_wave_index
-		print("All waves finished!"); return
+	# Adjust wave starting logic if necessary - assuming current_wave_index maps 0-based
+	print("Attempting to start wave for index: ", current_wave_index)
 	if current_wave_index >= len(current_wave_data):
 		print("All waves finished!")
 		return
@@ -276,8 +343,7 @@ func _get_zomg_stats() -> BloonStats:
 
 func _get_ddt_stats() -> BloonStats:
 	# Children need to be Camo Regrow Ceramics - handle this later if needed
-	# For now, just regular Ceramics
-	var child_stats = _get_ceramic_stats()
+	var child_stats = _get_camo_regrow_ceramic_stats() # Use dedicated function
 	child_stats.is_camo = true
 	child_stats.is_regrow = true # Note: This mutates the result of _get_ceramic_stats. Better to create fresh if needed elsewhere.
 	# health, speed, cash, child_stats, child_count, camo, lead
@@ -294,4 +360,106 @@ func _get_bad_stats() -> BloonStats:
 	stats.bloon_type = "BAD"
 	stats.moab_class = true
 	return stats
+
+# --- Fortified Stat Functions ---
+func _get_fortified_lead_stats() -> BloonStats:
+	var stats = _get_lead_stats()
+	stats.health = 2 # Fortified Lead has 2 health (vs 1)
+	stats.is_fortified = true
+	return stats
+
+func _get_fortified_ceramic_stats() -> BloonStats:
+	var stats = _get_ceramic_stats()
+	stats.health *= 2 # Fortified Ceramic has 20 health (vs 10)
+	stats.is_fortified = true
+	return stats
+
+func _get_fortified_moab_stats() -> BloonStats:
+	var stats = _get_moab_stats()
+	stats.health *= 2 # Fortified MOAB has 400 health (vs 200)
+	stats.is_fortified = true
+	# Children are standard Ceramics
+	return stats
+
+func _get_fortified_bfb_stats() -> BloonStats:
+	var stats = _get_bfb_stats()
+	stats.health *= 2 # Fortified BFB has 1400 health (vs 700)
+	stats.is_fortified = true
+	# Children are standard MOABs
+	return stats
+
+func _get_fortified_zomg_stats() -> BloonStats:
+	var stats = _get_zomg_stats()
+	stats.health *= 2 # Fortified ZOMG has 8000 health (vs 4000)
+	stats.is_fortified = true
+	# Children are standard BFBs
+	return stats
+
+func _get_fortified_ddt_stats() -> BloonStats:
+	var stats = _get_ddt_stats()
+	stats.health *= 2 # Fortified DDT has 800 health (vs 400)
+	stats.is_fortified = true
+	# Children are Camo Regrow Ceramics (already handled by _get_ddt_stats child)
+	return stats
+
+func _get_fortified_bad_stats() -> BloonStats:
+	var stats = _get_bad_stats()
+	stats.health *= 2 # Fortified BAD has 40000 health (vs 20000)
+	stats.is_fortified = true
+	# Children are standard ZOMGs and DDTs (handled by BAD pop logic)
+	return stats
+
+# --- Camo Stat Functions ---
+func _get_camo_lead_stats() -> BloonStats:
+	var stats = _get_lead_stats()
+	stats.is_camo = true
+	return stats
+
+func _get_camo_purple_stats() -> BloonStats:
+	var stats = _get_purple_stats()
+	stats.is_camo = true
+	return stats
+
+func _get_camo_ceramic_stats() -> BloonStats:
+	var stats = _get_ceramic_stats()
+	stats.is_camo = true
+	return stats
+
+# --- Regrow Stat Functions ---
+func _get_regrow_lead_stats() -> BloonStats:
+	var stats = _get_lead_stats()
+	stats.is_regrow = true
+	return stats
+
+# --- Combined Stat Functions ---
+func _get_camo_regrow_lead_stats() -> BloonStats:
+	var stats = _get_lead_stats()
+	stats.is_camo = true
+	stats.is_regrow = true
+	return stats
+
+func _get_fortified_camo_lead_stats() -> BloonStats:
+	var stats = _get_fortified_lead_stats()
+	stats.is_camo = true
+	return stats
+
+func _get_fortified_camo_ceramic_stats() -> BloonStats:
+	var stats = _get_fortified_ceramic_stats()
+	stats.is_camo = true
+	return stats
+
+func _get_fortified_camo_regrow_lead_stats() -> BloonStats:
+	# Needed for r126
+	var stats = _get_fortified_lead_stats()
+	stats.is_camo = true
+	stats.is_regrow = true
+	return stats
+
+func _get_camo_regrow_ceramic_stats() -> BloonStats:
+	# Needed for DDT children
+	var stats = _get_ceramic_stats()
+	stats.is_camo = true
+	stats.is_regrow = true
+	return stats
+
 #endregion
