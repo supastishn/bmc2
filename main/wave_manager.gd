@@ -408,9 +408,10 @@ func _on_spawn_timer_timeout():
 		# wave_timer.start()
 
 
-func spawn_bloon(bloon_stats_resource: BloonStats, p_progress_ratio: float = 0.0): # Added progress ratio param
+func spawn_bloon(bloon_stats_resource: BloonStats, p_progress_ratio: float = 0.0, immune_to_projectile: Object = null): # Added progress ratio and immunity params
 	if not path_node: printerr("Path node not set in WaveManager!"); return
 	if not base_bloon_scene: printerr("Base Bloon Scene not set in WaveManager!"); return
+	# print_debug("Spawning %s at ratio %.2f, immune to %s" % [bloon_stats_resource.bloon_type, p_progress_ratio, immune_to_projectile]) # Debug
 	if not bloon_stats_resource or not bloon_stats_resource is BloonStats: # Check type
 		printerr("Invalid BloonStats resource provided to spawn_bloon!")
 		return
@@ -429,7 +430,7 @@ func spawn_bloon(bloon_stats_resource: BloonStats, p_progress_ratio: float = 0.0
 	# --- Add to Scene and Configure ---
 	# NEW: Initialize the bloon with the correct stats using the dedicated method
 	if bloon_instance.has_method("initialize_with_stats"):
-		bloon_instance.initialize_with_stats(bloon_stats_resource)
+		bloon_instance.initialize_with_stats(bloon_stats_resource, immune_to_projectile) # Pass immunity
 	else:
 		printerr("Bloon instance %s is missing initialize_with_stats method!" % bloon_instance.name)
 		# Handle error: Free the instance and decrement count
@@ -471,10 +472,10 @@ func _check_round_clear():
 		# No longer advances round or starts timer here
 
 # --- NEW: Child Spawning Handler ---
-func _on_bloon_spawn_children(children_stats_array: Array, spawn_progress_ratio: float):
+func _on_bloon_spawn_children(children_stats_array: Array, spawn_progress_ratio: float, popping_projectile: Object): # Added popping_projectile param
 	for child_stats in children_stats_array:
 		if child_stats is BloonStats:
-			spawn_bloon(child_stats, spawn_progress_ratio)
+			spawn_bloon(child_stats, spawn_progress_ratio, popping_projectile) # Pass projectile for immunity
 		else:
 			printerr("Invalid child stats received in _on_bloon_spawn_children: ", child_stats)
 

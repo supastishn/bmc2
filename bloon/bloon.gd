@@ -3,8 +3,8 @@ extends PathFollow3D
 
 ## Signal emitted when the bloon is ready to return to the pool.
 ## Passes an array of BloonStats for children to be spawned and the progress ratio.
-signal spawn_children_requested(children_stats_array: Array, spawn_progress_ratio: float)
-signal returned_to_pool(node: Node)
+signal spawn_children_requested(children_stats_array: Array, spawn_progress_ratio: float, popping_projectile: Object) # ADDED projectile
+signal returned_to_pool(node: Node) # This signal is used by NodePoolManager
 # --- NEW: Signal emitted when the bloon is definitively off the field ---
 signal bloon_removed_from_play
 
@@ -17,6 +17,8 @@ var is_released := false # Flag to prevent double-release
 # How long after being hit before regrow starts
 const REGROW_DELAY = 2.0
 # How often the bloon regrows one layer
+# --- Spawn Immunity ---
+var _immune_to_this_projectile: Object = null # Projectile instance to ignore temporarily
 const REGROW_INTERVAL = 1.0
 
 func _ready():
@@ -57,7 +59,8 @@ func _physics_process(delta):
 
 
 # --- NEW: Called by WaveManager after getting node from pool ---
-func initialize_with_stats(new_stats: BloonStats):
+func initialize_with_stats(new_stats: BloonStats, immune_to_projectile: Object = null): # ADDED immunity param
+	# print_debug("Initializing %s, Immune to: %s" % [new_stats.bloon_type if new_stats else "Unknown", immune_to_projectile]) # Debug
 	if not new_stats:
 		printerr("Bloon %s received null stats during initialization!" % name)
 		release_to_pool() # Release it back if stats are invalid
@@ -67,6 +70,11 @@ func initialize_with_stats(new_stats: BloonStats):
 	current_health = stats.health
 	max_health = stats.health # Store the original health
 	# --- Debug: Confirm health initialization ---
+	# --- Set Temporary Spawn Immunity ---
+	_immune_to_this_projectile = immune_to_projectile
+	if _immune_to_this_projectile != null:
+		_clear_spawn_immunity.call_deferred() # Clear immunity after this frame
+
 	print("Initialized Bloon '%s' with health: %d (from stats: %d)" % [stats.bloon_type if stats else "Unknown", current_health, stats.health])
 	# TODO: Optionally update mesh/material based on stats here if needed
 	# Must be slightly below 1
@@ -74,8 +82,17 @@ func initialize_with_stats(new_stats: BloonStats):
 		handle_reached_end()
 
 
-func take_damage(amount: int):
+# --- NEW: Clear Spawn Immunity ---
+func _clear_spawn_immunity():
+	# print_debug("Clearing spawn immunity for %s from projectile %s" % [stats.bloon_type if stats else "Unknown", _immune_to_this_projectile]) # Debug
+	_immune_to_this_projectile = null
+
+
+func take_damage(amount: int, source_projectile: Object = null): # ADDED source_projectile param
 	if not stats or is_released: return
+	if _immune_to_this_projectile != null and source_projectile == _immune_to_this_projectile:
+		print("Bloon '%s' ignored damage from projectile %s due to spawn immunity." % [stats.bloon_type if stats else "Unknown", source_projectile]) # Debug
+		return # Ignore damage from the specific projectile it should be immune to
 
 	# Stop and reset regrow timer if it's a regrow bloon
 	if stats.is_regrow and regrow_timer:
@@ -91,7 +108,7 @@ func take_damage(amount: int):
 	current_health -= amount
 	# Print new health
 	print("Bloon '%s' health after damage: %d" % [stats.bloon_type if stats else "Unknown", current_health])
-	if current_health <= 0:
+	if current_health <= 0:		
 		handle_pop()
 
 
@@ -117,7 +134,7 @@ func handle_pop():
 				children_to_spawn.append(stats.child_bloon_stats)
 
 		if not children_to_spawn.is_empty():
-			emit_signal("spawn_children_requested", children_to_spawn, progress_ratio)
+			emit_signal("spawn_children_requested", children_to_spawn, progress_ratio, source_projectile_that_popped_me)
 
 	print("Bloon Popped!")
 	# Stop regrow timer permanently if popped
