@@ -40,7 +40,7 @@ var tower_data := {
 		"base": {
 			# 000: 32r, 0.95s, dart: 1d, 2p, sharp, speed 35, lifetime 0.7
 			"tower": TowerStats.new(0.95, 3.5, false, BASE_PROJECTILE_SCENE, DART_MONKEY_MESH),
-			"projectile": ProjectileStats.new(p_speed=35.0, p_damage=1, p_lifetime=0.7, p_pierce=2, p_mesh=DART_PROJECTILE_MESH, p_damage_type="Sharp"),
+			"projectile": ProjectileStats.new(35.0, 1, 0.7, 2, false, 5.0, DART_PROJECTILE_MESH, "Sharp"),
 			"cost": 200 # Base cost of Dart Monkey
 		},
 		"path1": {
@@ -163,6 +163,7 @@ var tower_data := {
 	ps.speed *= 1.1 # Guess
 		}
 	},
+	},
 	# --- Add data for other towers ---
 }
 
@@ -209,16 +210,17 @@ func create_stats(tower_name: String, upgrade_path_str: String) -> Dictionary:
 		# Base cooldown is 0.95s
 		match p2: # Apply path 2 speed boosts cumulatively
 			1: cooldown_multiplier *= 0.85 # 0.95 * 0.85 = 0.8075s
-			2: # Cooldown is set directly below (0.6365s). Multiplier logic bypassed for T2+.
-			   # Simplification: Use target values directly if known
-			   # cooldown_multiplier = 0.67 # Target multiplier for T2
-			   current_tower_stats.attack_cooldown = 0.6365 # Set directly based on 020 stats
+			2: 
+				cooldown_multiplier *= 0.85 * (0.8075 / 0.95 * 0.7882) # ~0.67 total multi -> 0.6365s
+			# Simplification: Use target values directly if known
+			# cooldown_multiplier = 0.67 # Target multiplier for T2
+				current_tower_stats.attack_cooldown = 0.6365 # Set directly based on 020 stats
 			3: # Triple shot: 75%s relative to T2 -> 0.6365 * 0.75 = 0.4774s
-			   current_tower_stats.attack_cooldown = 0.4774
+				current_tower_stats.attack_cooldown = 0.4774
 			4: # Fan Club: 50%s relative to T3 -> 0.4774 * 0.5 = 0.2387s
-			   current_tower_stats.attack_cooldown = 0.2387
+				current_tower_stats.attack_cooldown = 0.2387
 			5: # PMFC: Same speed as T4
-			   current_tower_stats.attack_cooldown = 0.2387
+				current_tower_stats.attack_cooldown = 0.2387
 
 		# Apply multiplier only if T2 wasn't reached (direct values used above for T2+)
 		if p2 < 2:
@@ -277,8 +279,8 @@ func get_upgrade_details(tower_name: String, path_index: int, tier: int) -> Dict
 
 ## --- NEW: Get base cost of a tower ---
 func get_base_cost(tower_name: String) -> int:
-	if tower_data.has(tower_name) and tower_data[tower_name].has("base") and tower_data[tower_name]["base"].has("cost"):
-		return tower_data[tower_name]["base"]["cost"]
+	if tower_data.has(tower_name) and tower_data[tower_name].has("base") and tower_data[tower_name].base.has("cost"):
+		return tower_data[tower_name].base.cost
 	else:
 		printerr("TowerFactory: Base cost not found for '", tower_name, "'")
 		return 999999 # Return high value on error
