@@ -10,6 +10,8 @@ signal bloon_removed_from_play
 
 @export var stats: BloonStats
 @onready var regrow_timer: Timer = $RegrowTimer # Added
+# --- NEW: Mesh Reference ---
+@onready var mesh_instance: MeshInstance3D = $MeshInstance3D
 
 var current_health: int
 var max_health: int # Added for regrow cap
@@ -20,6 +22,27 @@ const REGROW_DELAY = 2.0
 # --- Spawn Immunity ---
 const REGROW_INTERVAL = 1.0
 var _immune_to_projectiles: Array[Object] = [] # Projectiles to ignore temporarily
+
+# --- NEW: Material Mapping ---
+const BLOON_MATERIALS = {
+	"Red": preload("res://resources/materials/bloons/red_bloon_material.tres"),
+	"Blue": preload("res://resources/materials/bloons/blue_bloon_material.tres"),
+	"Green": preload("res://resources/materials/bloons/green_bloon_material.tres"),
+	"Yellow": preload("res://resources/materials/bloons/yellow_bloon_material.tres"),
+	"Pink": preload("res://resources/materials/bloons/pink_bloon_material.tres"),
+	"Black": preload("res://resources/materials/bloons/black_bloon_material.tres"),
+	"White": preload("res://resources/materials/bloons/white_bloon_material.tres"),
+	"Lead": preload("res://resources/materials/bloons/lead_bloon_material.tres"),
+	"Zebra": preload("res://resources/materials/bloons/zebra_bloon_material.tres"),
+	"Rainbow": preload("res://resources/materials/bloons/rainbow_bloon_material.tres"),
+	"Purple": preload("res://resources/materials/bloons/purple_bloon_material.tres"),
+	"Ceramic": preload("res://resources/materials/bloons/ceramic_bloon_material.tres"),
+	"MOAB": preload("res://resources/materials/bloons/moab_bloon_material.tres"),
+	"BFB": preload("res://resources/materials/bloons/bfb_bloon_material.tres"),
+	"ZOMG": preload("res://resources/materials/bloons/zomg_bloon_material.tres"),
+	"DDT": preload("res://resources/materials/bloons/ddt_bloon_material.tres"),
+	"BAD": preload("res://resources/materials/bloons/bad_bloon_material.tres"),
+}
 
 func _ready():
 	# Don't initialize health here if it's reset in pool_reset
@@ -43,6 +66,9 @@ func pool_reset():
 	if regrow_timer:
 		regrow_timer.stop()
 
+	# Clear material override
+	if is_instance_valid(mesh_instance):
+		mesh_instance.material_override = null
 	# Ensure physics process is enabled (will be started in _physics_process if needed)
 
 	# Ensure physics process is enabled
@@ -83,8 +109,9 @@ func initialize_with_stats(new_stats: BloonStats, immune_to_projectile: Object =
 		print("Bloon '%s' initializing with NO projectile immunity." % [stats.bloon_type if stats else "Unknown"])
 
 	print("Initialized Bloon '%s' with health: %d (from stats: %d)" % [stats.bloon_type if stats else "Unknown", current_health, stats.health])
-	# TODO: Optionally update mesh/material based on stats here if needed
-	# Must be slightly below 1
+	# --- Update Material ---
+	_update_material()
+
 	if progress_ratio >= 0.99: # Changed threshold to be closer to end
 		handle_reached_end()
 
@@ -176,6 +203,27 @@ func handle_reached_end():
 	GameManager.decrease_lives(1)
 	print("Bloon Reached End!")
 	release_to_pool()
+
+
+# --- NEW: Update mesh material based on stats ---
+func _update_material():
+	if not stats or not is_instance_valid(mesh_instance):
+		return
+
+	var material_to_apply = null
+	var base_type = stats.bloon_type # Assumes stats.bloon_type holds the base name
+
+	if BLOON_MATERIALS.has(base_type):
+		material_to_apply = BLOON_MATERIALS[base_type]
+	else:
+		print_warning("No material found for bloon type: ", base_type, " on node ", name)
+		# Fallback to the mesh's default material by setting override to null
+		material_to_apply = null
+
+	mesh_instance.material_override = material_to_apply
+
+	# TODO: Add visual indicators for Camo, Regrow, Fortified later (e.g., shaders, extra meshes)
+
 
 
 ## Call this instead of queue_free()
