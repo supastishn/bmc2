@@ -95,23 +95,189 @@ func _on_spawn_timer_timeout():
 		# wave_timer.start()
 
 
-func spawn_bloon(bloon_stats_resource: BloonStats, p_progress_ratio: float = 0.0):
+func spawn_bloon(bloon_stats_resource: BloonStats, p_progress_ratio: float = 0.0): # Added progress ratio param
 	if not path_node: printerr("Path node not set in WaveManager!"); return
 	if not base_bloon_scene: printerr("Base Bloon Scene not set in WaveManager!"); return
-	if not bloon_stats_resource or not bloon_stats_resource is BloonStats:
+	if not bloon_stats_resource or not bloon_stats_resource is BloonStats: # Check type
 		printerr("Invalid BloonStats resource provided to spawn_bloon!")
 		return
 
 	# --- Request Bloon from Pool ---
 	# We always use the base scene, the stats resource defines the type
-	var bloon_instance: Node = NodePoolManager.request_node(base_bloon_scene)
+	var bloon_instance: Node = NodePoolManager.request_node(base_bloon_scene) # Changed type hint
 	if not bloon_instance:
 		printerr("WaveManager failed to get bloon from pool/fallback!")
 		return # Failed to get a bloon
 
 	# --- Add to Scene and Configure ---
-	# IMPORTANT: Add to the Path3D node *before* configuring PathFollow specifics
+	# Set stats *before* adding to path? pool_reset should handle internal state.
+	if bloon_instance.has_method("set_stats"): # Assume bloon.gd has set_stats if needed
+		bloon_instance.stats = bloon_stats_resource # Directly assign the stats resource
+	else:
+		printerr("Bloon instance is missing set_stats method!") # Should not happen if using pool_reset correctly
+
 	path_node.add_child(bloon_instance)
+	# --- NEW: Set progress ratio for children ---
+	if p_progress_ratio > 0.0 and bloon_instance is PathFollow3D:
+		bloon_instance.progress_ratio = p_progress_ratio
+
+	# --- NEW: Connect child spawning signal ---
+	if not bloon_instance.spawn_children_requested.is_connected(_on_bloon_spawn_children):
+		bloon_instance.spawn_children_requested.connect(_on_bloon_spawn_children)
 
 	# The bloon's pool_reset() should handle setting progress to 0.
 	# No further setup needed here unless you have wave-specific modifications.
+
+
+# --- NEW: Child Spawning Handler ---
+func _on_bloon_spawn_children(children_stats_array: Array, spawn_progress_ratio: float):
+	for child_stats in children_stats_array:
+		if child_stats is BloonStats:
+			spawn_bloon(child_stats, spawn_progress_ratio)
+		else:
+			printerr("Invalid child stats received in _on_bloon_spawn_children: ", child_stats)
+
+#endregion Factory Functions
+
+
+#region Bloon Stat Functions
+# --- Bloon Stat Definition Functions ---
+
+func _get_red_stats() -> BloonStats:
+	return BloonStats.new(
+		p_health=1, p_speed=BASE_RED_SPEED, p_cash_value=1,
+		p_bloon_type="Red"
+	)
+
+func _get_blue_stats() -> BloonStats:
+	return BloonStats.new(
+		p_health=1, p_speed=BASE_RED_SPEED * 1.4, p_cash_value=1,
+		p_child_stats=_get_red_stats(), p_child_count=1,
+		p_bloon_type="Blue"
+	)
+
+func _get_green_stats() -> BloonStats:
+	return BloonStats.new(
+		p_health=1, p_speed=BASE_RED_SPEED * 1.8, p_cash_value=1,
+		p_child_stats=_get_blue_stats(), p_child_count=1,
+		p_bloon_type="Green"
+	)
+
+func _get_yellow_stats() -> BloonStats:
+	return BloonStats.new(
+		p_health=1, p_speed=BASE_RED_SPEED * 3.2, p_cash_value=1,
+		p_child_stats=_get_green_stats(), p_child_count=1,
+		p_bloon_type="Yellow"
+	)
+
+func _get_pink_stats() -> BloonStats:
+	return BloonStats.new(
+		p_health=1, p_speed=BASE_RED_SPEED * 3.5, p_cash_value=1,
+		p_child_stats=_get_yellow_stats(), p_child_count=1,
+		p_bloon_type="Pink"
+	)
+
+func _get_black_stats() -> BloonStats:
+	return BloonStats.new(
+		p_health=1, p_speed=BASE_RED_SPEED * 1.8, p_cash_value=1,
+		p_child_stats=_get_pink_stats(), p_child_count=2,
+		p_immunities=["Explosive"],
+		p_bloon_type="Black"
+	)
+
+func _get_white_stats() -> BloonStats:
+	return BloonStats.new(
+		p_health=1, p_speed=BASE_RED_SPEED * 2.0, p_cash_value=1,
+		p_child_stats=_get_pink_stats(), p_child_count=2,
+		p_immunities=["Ice"],
+		p_bloon_type="White"
+	)
+
+func _get_lead_stats() -> BloonStats:
+	return BloonStats.new(
+		p_health=1, p_speed=BASE_RED_SPEED * 1.0, p_cash_value=1,
+		p_child_stats=_get_black_stats(), p_child_count=2,
+		p_is_lead=true, p_immunities=["Sharp"],
+		p_bloon_type="Lead"
+	)
+
+func _get_zebra_stats() -> BloonStats:
+	# Children handled specially in bloon.gd handle_pop
+	return BloonStats.new(
+		p_health=1, p_speed=BASE_RED_SPEED * 1.8, p_cash_value=1,
+		p_child_stats=null, p_child_count=0, # Children defined in handle_pop
+		p_immunities=["Explosive", "Ice"],
+		p_bloon_type="Zebra"
+	)
+
+func _get_rainbow_stats() -> BloonStats:
+	return BloonStats.new(
+		p_health=1, p_speed=BASE_RED_SPEED * 2.2, p_cash_value=1,
+		p_child_stats=_get_zebra_stats(), p_child_count=2,
+		p_bloon_type="Rainbow"
+	)
+
+func _get_purple_stats() -> BloonStats:
+	return BloonStats.new(
+		p_health=1, p_speed=BASE_RED_SPEED * 3.0, p_cash_value=1,
+		p_child_stats=_get_pink_stats(), p_child_count=2,
+		p_immunities=["Fire", "Plasma", "Energy"],
+		p_bloon_type="Purple"
+	)
+
+func _get_ceramic_stats() -> BloonStats:
+	return BloonStats.new(
+		p_health=10, p_speed=BASE_RED_SPEED * 2.5, p_cash_value=1,
+		p_child_stats=_get_rainbow_stats(), p_child_count=2,
+		p_bloon_type="Ceramic"
+	)
+
+func _get_moab_stats() -> BloonStats:
+	return BloonStats.new(
+		p_health=200, p_speed=BASE_RED_SPEED * 1.0, p_cash_value=1,
+		p_child_stats=_get_ceramic_stats(), p_child_count=4,
+		p_moab_class=true,
+		p_bloon_type="MOAB"
+	)
+
+func _get_bfb_stats() -> BloonStats:
+	return BloonStats.new(
+		p_health=700, p_speed=BASE_RED_SPEED * 0.25, p_cash_value=1,
+		p_child_stats=_get_moab_stats(), p_child_count=4,
+		p_moab_class=true,
+		p_bloon_type="BFB"
+	)
+
+func _get_zomg_stats() -> BloonStats:
+	return BloonStats.new(
+		p_health=4000, p_speed=BASE_RED_SPEED * 0.18, p_cash_value=1,
+		p_child_stats=_get_bfb_stats(), p_child_count=4,
+		p_moab_class=true,
+		p_bloon_type="ZOMG"
+	)
+
+func _get_ddt_stats() -> BloonStats:
+	# Children need to be Camo Regrow Ceramics - handle this later if needed
+	# For now, just regular Ceramics
+	var child_ceramic_stats = _get_ceramic_stats()
+	child_ceramic_stats.is_camo = true
+	child_ceramic_stats.is_regrow = true
+	return BloonStats.new(
+		p_health=400, p_speed=BASE_RED_SPEED * 2.75, p_cash_value=1,
+		p_child_stats=child_ceramic_stats, p_child_count=4,
+		p_is_camo=true, p_is_lead=true,
+		p_immunities=["Sharp", "Explosive"], # Lead + Black properties
+		p_moab_class=true,
+		p_bloon_type="DDT"
+	)
+
+func _get_bad_stats() -> BloonStats:
+	# Children handled specially in bloon.gd handle_pop
+	return BloonStats.new(
+		p_health=20000, p_speed=BASE_RED_SPEED * 0.18, p_cash_value=1,
+		p_child_stats=null, p_child_count=0, # Children defined in handle_pop
+		p_moab_class=true,
+		p_bloon_type="BAD"
+	)
+#endregion
+
