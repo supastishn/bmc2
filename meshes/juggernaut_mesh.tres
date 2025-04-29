@@ -1,0 +1,6 @@
+[gd_resource type="SphereMesh" format=3 uid="uid://bd3187b1p687a"]
+
+[resource]
+radius = 0.5
+height = 1.0
+
