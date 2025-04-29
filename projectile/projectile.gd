@@ -149,6 +149,8 @@ func _on_area_entered(other_area: Area3D):
 
 	# --- Apply Damage ---
 	if parent_node.has_method("take_damage"):
+		# --- Debug: Log projectile ID before dealing damage ---
+		print("Projectile %s (ID: %d) dealing %d damage to %s" % [name, get_instance_id(), actual_damage, parent_node.name])
 		parent_node.take_damage(actual_damage, self) # Pass projectile instance
 
 	current_pierce -= 1

@@ -73,9 +73,14 @@ func initialize_with_stats(new_stats: BloonStats, immune_to_projectile: Object =
 	# --- Set Temporary Spawn Immunity ---
 	_immune_to_projectiles.clear() # Clear any previous immunity
 	if immune_to_projectile != null:
+		# --- Debug: Log projectile ID being added to immunity ---
+		print("Bloon '%s' adding immunity against Projectile ID: %d" % [stats.bloon_type if stats else "Unknown", immune_to_projectile.get_instance_id()])
 		_immune_to_projectiles.append(immune_to_projectile)
 		_clear_spawn_immunity.call_deferred() # Clear immunity after this frame
 		# print_debug("Added immunity for %s against %s" % [stats.bloon_type if stats else "Unknown", immune_to_projectile]) # Debug
+	else:
+		# --- Debug: Log if no projectile immunity is being added ---
+		print("Bloon '%s' initializing with NO projectile immunity." % [stats.bloon_type if stats else "Unknown"])
 
 	print("Initialized Bloon '%s' with health: %d (from stats: %d)" % [stats.bloon_type if stats else "Unknown", current_health, stats.health])
 	# TODO: Optionally update mesh/material based on stats here if needed
@@ -87,14 +92,23 @@ func initialize_with_stats(new_stats: BloonStats, immune_to_projectile: Object =
 # --- NEW: Clear Spawn Immunity ---
 func _clear_spawn_immunity():
 	# print_debug("Clearing spawn immunity list for %s (contained %d)" % [stats.bloon_type if stats else "Unknown", _immune_to_projectiles.size()]) # Debug
+	# --- Debug: Log IDs being cleared ---
+	var ids_to_clear = []
+	for proj in _immune_to_projectiles:
+		ids_to_clear.append(proj.get_instance_id() if is_instance_valid(proj) else "Invalid")
+	print("Bloon '%s' clearing spawn immunity for Projectile IDs: %s" % [stats.bloon_type if stats else "Unknown", ids_to_clear])
 	_immune_to_projectiles.clear()
 
 
 func take_damage(amount: int, source_projectile: Object = null): # ADDED source_projectile param
 	if not stats or is_released: return
 
+	# --- Debug: Log incoming projectile ID and current immunity IDs ---
+	var incoming_id = source_projectile.get_instance_id() if is_instance_valid(source_projectile) else "None"
+	var immune_ids = []
+	for proj in _immune_to_projectiles: immune_ids.append(proj.get_instance_id() if is_instance_valid(proj) else "Invalid")
 	# --- Debug: Print incoming projectile and immunity list ---
-	print("Take Damage: Incoming projectile %s. Immune to: %s" % [source_projectile, _immune_to_projectiles])
+	print("Take Damage on %s: Incoming projectile ID %s. Immune to IDs: %s" % [stats.bloon_type if stats else "Unknown", incoming_id, immune_ids])
 
 	if not _immune_to_projectiles.is_empty() and source_projectile in _immune_to_projectiles:
 		print("Bloon '%s' ignored damage from projectile %s due to spawn immunity." % [stats.bloon_type if stats else "Unknown", source_projectile]) # Debug
