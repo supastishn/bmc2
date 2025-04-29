@@ -74,8 +74,12 @@ func take_damage(amount: int):
 		regrow_timer.one_shot = true # Temporarily one-shot for the delay
 		regrow_timer.start()
 
+	# Print original health and damage amount
+	print("Bloon '%s' health before damage: %d (taking %d damage)" % [stats.bloon_type if stats else "Unknown", current_health, amount])
 
 	current_health -= amount
+	# Print new health
+	print("Bloon '%s' health after damage: %d" % [stats.bloon_type if stats else "Unknown", current_health])
 	if current_health <= 0:
 		handle_pop()
 
