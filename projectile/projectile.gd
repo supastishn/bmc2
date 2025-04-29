@@ -129,8 +129,28 @@ func _on_area_entered(other_area: Area3D):
 	if bloon_stats.is_lead and not stats.can_pop_lead:
 		release_to_pool() # Don't print, just release
 		return
+
+	# --- Calculate actual damage dealt ---
+	var actual_damage = stats.damage
+
+	# Apply crit damage (if applicable - needs tower to track shot count)
+	# This needs a way for the tower to tell the projectile if it's a crit.
+	# For now, we'll skip crit application directly in projectile.
+	# if stats.crit_frequency > 0 and (shot_counter % stats.crit_frequency == 0): # Needs shot_counter info
+	#	actual_damage += stats.crit_extra_damage
+
+	# Apply bonus damage based on bloon type
+	if bloon_stats.is_fortified:
+		actual_damage += stats.extra_fortified_damage
+	if bloon_stats.bloon_type == "Ceramic": # Check specific type
+		actual_damage += stats.extra_ceramic_damage
+	if bloon_stats.is_lead: # Check lead property
+		actual_damage += stats.extra_lead_damage
+
+	# --- Apply Damage ---
 	if parent_node.has_method("take_damage"):
-		parent_node.take_damage(stats.damage)
+		parent_node.take_damage(actual_damage) # Use calculated damage
+
 	current_pierce -= 1
 	if current_pierce <= 0:
 		release_to_pool()
