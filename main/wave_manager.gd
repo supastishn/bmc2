@@ -110,11 +110,8 @@ func spawn_bloon(bloon_stats_resource: BloonStats, p_progress_ratio: float = 0.0
 		return # Failed to get a bloon
 
 	# --- Add to Scene and Configure ---
-	# Set stats *before* adding to path? pool_reset should handle internal state.
-	if bloon_instance.has_method("set_stats"): # Assume bloon.gd has set_stats if needed
-		bloon_instance.stats = bloon_stats_resource # Directly assign the stats resource
-	else:
-		printerr("Bloon instance is missing set_stats method!") # Should not happen if using pool_reset correctly
+	# Assign stats directly. The pool_reset should handle applying them internally if needed.
+	bloon_instance.stats = bloon_stats_resource
 
 	path_node.add_child(bloon_instance)
 	# --- NEW: Set progress ratio for children ---
