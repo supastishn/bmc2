@@ -6,6 +6,8 @@
 [ext_resource type="PackedScene" uid="uid://4e728yqgfrlm" path="res://gui/game.tscn" id="6_kfbq2"]
 
 
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_rxg2q"]
+
 [sub_resource type="Sky" id="Sky_glv2v"]
 sky_material = SubResource("ProceduralSkyMaterial_rxg2q")
 
