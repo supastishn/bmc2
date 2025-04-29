@@ -33,7 +33,7 @@ func _ready():
 		# ... Add rounds 1 through 122 here if needed ...
 		# --- Rounds 1-122 --- (Based on Standard BTD6 Rounds, delays are estimates)
 		# Round 1 (Index 0): 20 Red
-		[ {"stats_func": _get_red_stats, "count": 20, "delay": 1.0} ],
+		[ {"stats_func": _get_blue_stats, "count": 20, "delay": 1.0} ],
 		# Round 2 (Index 1): 35 Red
 		[ {"stats_func": _get_red_stats, "count": 35, "delay": 0.8} ],
 		# Round 3 (Index 2): 25 Red, 5 Blue
