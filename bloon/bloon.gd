@@ -5,6 +5,8 @@ extends PathFollow3D
 ## Passes an array of BloonStats for children to be spawned and the progress ratio.
 signal spawn_children_requested(children_stats_array: Array, spawn_progress_ratio: float)
 signal returned_to_pool(node: Node)
+# --- NEW: Signal emitted when the bloon is definitively off the field ---
+signal bloon_removed_from_play
 
 @export var stats: BloonStats
 @onready var regrow_timer: Timer = $RegrowTimer # Added
@@ -144,6 +146,9 @@ func release_to_pool():
 	# Stop processing
 	set_physics_process(false)
 	visible = false # Optionally hide it immediately
+
+	# --- NEW: Emit removal signal BEFORE returning to pool ---
+	emit_signal("bloon_removed_from_play")
 
 	# Stop regrow timer if active
 	if regrow_timer: regrow_timer.stop()

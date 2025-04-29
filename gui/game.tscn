@@ -20,11 +20,12 @@ text = "Lives:"
 [node name="CashLabel" type="Label" parent="HUD"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Cash:"
+text = "Cash: 650"
 
-[node name="Label3" type="Label" parent="HUD"]
+[node name="RoundLabel" type="Label" parent="HUD"]
+unique_name_in_owner = true
 layout_mode = 2
-text = "Round:"
+text = "Round: 0"
 
 [node name="TowerPlacementGUI" parent="." instance=ExtResource("2_83t4r")]
 visibility_layer = 131073

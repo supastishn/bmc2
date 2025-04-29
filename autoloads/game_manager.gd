@@ -3,10 +3,11 @@ extends Node
 
 var lives = 100
 var cash = 650
-var current_round = 0
+var current_round = 0 # Starts at 0, first wave is round 1
 
 signal lives_changed(new_lives)
 signal cash_changed(new_cash)
+signal round_changed(new_round) # NEW Signal
 
 func decrease_lives(amount = 1):
 	lives -= amount
@@ -29,6 +30,12 @@ func spend_cash(amount):
 		emit_signal("cash_changed", cash)
 		return true
 	return false
+
+# --- NEW: Function to advance the round ---
+func advance_round():
+	current_round += 1
+	print("Starting Round ", current_round)
+	round_changed.emit(current_round)
 
 func game_over():
 	print("GAME OVER!")
