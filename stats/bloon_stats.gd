@@ -16,6 +16,18 @@ extends Resource
 ## Optional: Special properties like camo, lead, regen.
 @export var is_camo: bool = false
 @export var is_lead: bool = false
+# --- NEW Properties (Re-added based on previous intent) ---
+## Type identifier (e.g., "Red", "Blue", "MOAB").
+@export var bloon_type: String = "Base"
+## If true, the bloon has doubled health (or specific MOAB health increase).
+@export var is_fortified: bool = false
+## If true, the bloon regenerates health over time after not being damaged.
+@export var is_regrow: bool = false
+## List of damage types this bloon is immune to (e.g., ["Sharp", "Explosive"]).
+@export var immunities: Array[String] = []
+## True if this is a MOAB-class bloon (MOAB, BFB, ZOMG, DDT, BAD).
+@export var moab_class: bool = false
+
 
 
 # Constructor to allow programmatic initialization

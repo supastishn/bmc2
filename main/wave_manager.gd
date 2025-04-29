@@ -144,112 +144,127 @@ func _on_bloon_spawn_children(children_stats_array: Array, spawn_progress_ratio:
 # --- Bloon Stat Definition Functions ---
 
 func _get_red_stats() -> BloonStats:
-	# health, speed, cash, child_stats, child_count, camo, lead, type, fortified, regrow, immunities, moab
-	return BloonStats.new(
-		1, BASE_RED_SPEED, 1, null, 0, false, false, "Red", false, false, [], false
-	)
+	# health, speed, cash, child_stats, child_count, camo, lead
+	var stats = BloonStats.new(1, BASE_RED_SPEED, 1, null, 0, false, false)
+	stats.bloon_type = "Red"
+	# stats.is_fortified = false (default)
+	# stats.is_regrow = false (default)
+	# stats.immunities = [] (default)
+	# stats.moab_class = false (default)
+	return stats
 
 func _get_blue_stats() -> BloonStats:
-	# health, speed, cash, child_stats, child_count, camo, lead, type, fortified, regrow, immunities, moab
-	return BloonStats.new(
-		1, BASE_RED_SPEED * 1.4, 1, _get_red_stats(), 1, false, false, "Blue", false, false, [], false
-	)
+	# health, speed, cash, child_stats, child_count, camo, lead
+	var stats = BloonStats.new(1, BASE_RED_SPEED * 1.4, 1, _get_red_stats(), 1, false, false)
+	stats.bloon_type = "Blue"
+	return stats
 
 func _get_green_stats() -> BloonStats:
-	# health, speed, cash, child_stats, child_count, camo, lead, type, fortified, regrow, immunities, moab
-	return BloonStats.new(
-		1, BASE_RED_SPEED * 1.8, 1, _get_blue_stats(), 1, false, false, "Green", false, false, [], false
-	)
+	# health, speed, cash, child_stats, child_count, camo, lead
+	var stats = BloonStats.new(1, BASE_RED_SPEED * 1.8, 1, _get_blue_stats(), 1, false, false)
+	stats.bloon_type = "Green"
+	return stats
 
 func _get_yellow_stats() -> BloonStats:
-	# health, speed, cash, child_stats, child_count, camo, lead, type, fortified, regrow, immunities, moab
-	return BloonStats.new(
-		1, BASE_RED_SPEED * 3.2, 1, _get_green_stats(), 1, false, false, "Yellow", false, false, [], false
-	)
+	# health, speed, cash, child_stats, child_count, camo, lead
+	var stats = BloonStats.new(1, BASE_RED_SPEED * 3.2, 1, _get_green_stats(), 1, false, false)
+	stats.bloon_type = "Yellow"
+	return stats
 
 func _get_pink_stats() -> BloonStats:
-	# health, speed, cash, child_stats, child_count, camo, lead, type, fortified, regrow, immunities, moab
-	return BloonStats.new(
-		1, BASE_RED_SPEED * 3.5, 1, _get_yellow_stats(), 1, false, false, "Pink", false, false, [], false
-	)
+	# health, speed, cash, child_stats, child_count, camo, lead
+	var stats = BloonStats.new(1, BASE_RED_SPEED * 3.5, 1, _get_yellow_stats(), 1, false, false)
+	stats.bloon_type = "Pink"
+	return stats
 
 func _get_black_stats() -> BloonStats:
-	# health, speed, cash, child_stats, child_count, camo, lead, type, fortified, regrow, immunities, moab
-	return BloonStats.new(
-		1, BASE_RED_SPEED * 1.8, 1, _get_pink_stats(), 2, false, false, "Black", false, false, ["Explosive"], false
-	)
+	# health, speed, cash, child_stats, child_count, camo, lead
+	var stats = BloonStats.new(1, BASE_RED_SPEED * 1.8, 1, _get_pink_stats(), 2, false, false)
+	stats.bloon_type = "Black"
+	stats.immunities = ["Explosive"]
+	return stats
 
 func _get_white_stats() -> BloonStats:
-	# health, speed, cash, child_stats, child_count, camo, lead, type, fortified, regrow, immunities, moab
-	return BloonStats.new(
-		1, BASE_RED_SPEED * 2.0, 1, _get_pink_stats(), 2, false, false, "White", false, false, ["Ice"], false
-	)
+	# health, speed, cash, child_stats, child_count, camo, lead
+	var stats = BloonStats.new(1, BASE_RED_SPEED * 2.0, 1, _get_pink_stats(), 2, false, false)
+	stats.bloon_type = "White"
+	stats.immunities = ["Ice"]
+	return stats
 
 func _get_lead_stats() -> BloonStats:
-	# health, speed, cash, child_stats, child_count, camo, lead, type, fortified, regrow, immunities, moab
-	return BloonStats.new(
-		1, BASE_RED_SPEED * 1.0, 1, _get_black_stats(), 2, false, true, "Lead", false, false, ["Sharp"], false
-	)
+	# health, speed, cash, child_stats, child_count, camo, lead
+	var stats = BloonStats.new(1, BASE_RED_SPEED * 1.0, 1, _get_black_stats(), 2, false, true)
+	stats.bloon_type = "Lead"
+	stats.immunities = ["Sharp"]
+	return stats
 
 func _get_zebra_stats() -> BloonStats:
 	# Children handled specially in bloon.gd handle_pop
-	# health, speed, cash, child_stats, child_count, camo, lead, type, fortified, regrow, immunities, moab
-	return BloonStats.new(
-		1, BASE_RED_SPEED * 1.8, 1, null, 0, false, false, "Zebra", false, false, ["Explosive", "Ice"], false
-	)
+	# health, speed, cash, child_stats, child_count, camo, lead
+	var stats = BloonStats.new(1, BASE_RED_SPEED * 1.8, 1, null, 0, false, false)
+	stats.bloon_type = "Zebra"
+	stats.immunities = ["Explosive", "Ice"]
+	return stats
 
 func _get_rainbow_stats() -> BloonStats:
-	# health, speed, cash, child_stats, child_count, camo, lead, type, fortified, regrow, immunities, moab
-	return BloonStats.new(
-		1, BASE_RED_SPEED * 2.2, 1, _get_zebra_stats(), 2, false, false, "Rainbow", false, false, [], false
-	)
+	# health, speed, cash, child_stats, child_count, camo, lead
+	var stats = BloonStats.new(1, BASE_RED_SPEED * 2.2, 1, _get_zebra_stats(), 2, false, false)
+	stats.bloon_type = "Rainbow"
+	return stats
 
 func _get_purple_stats() -> BloonStats:
-	# health, speed, cash, child_stats, child_count, camo, lead, type, fortified, regrow, immunities, moab
-	return BloonStats.new(
-		1, BASE_RED_SPEED * 3.0, 1, _get_pink_stats(), 2, false, false, "Purple", false, false, ["Fire", "Plasma", "Energy"], false
-	)
+	# health, speed, cash, child_stats, child_count, camo, lead
+	var stats = BloonStats.new(1, BASE_RED_SPEED * 3.0, 1, _get_pink_stats(), 2, false, false)
+	stats.bloon_type = "Purple"
+	stats.immunities = ["Fire", "Plasma", "Energy"]
+	return stats
 
 func _get_ceramic_stats() -> BloonStats:
-	# health, speed, cash, child_stats, child_count, camo, lead, type, fortified, regrow, immunities, moab
-	return BloonStats.new(
-		10, BASE_RED_SPEED * 2.5, 1, _get_rainbow_stats(), 2, false, false, "Ceramic", false, false, [], false
-	)
+	# health, speed, cash, child_stats, child_count, camo, lead
+	var stats = BloonStats.new(10, BASE_RED_SPEED * 2.5, 1, _get_rainbow_stats(), 2, false, false)
+	stats.bloon_type = "Ceramic"
+	return stats
 
 func _get_moab_stats() -> BloonStats:
-	# health, speed, cash, child_stats, child_count, camo, lead, type, fortified, regrow, immunities, moab
-	return BloonStats.new(
-		200, BASE_RED_SPEED * 1.0, 1, _get_ceramic_stats(), 4, false, false, "MOAB", false, false, [], true
-	)
+	# health, speed, cash, child_stats, child_count, camo, lead
+	var stats = BloonStats.new(200, BASE_RED_SPEED * 1.0, 1, _get_ceramic_stats(), 4, false, false)
+	stats.bloon_type = "MOAB"
+	stats.moab_class = true
+	return stats
 
 func _get_bfb_stats() -> BloonStats:
-	# health, speed, cash, child_stats, child_count, camo, lead, type, fortified, regrow, immunities, moab
-	return BloonStats.new(
-		700, BASE_RED_SPEED * 0.25, 1, _get_moab_stats(), 4, false, false, "BFB", false, false, [], true
-	)
+	# health, speed, cash, child_stats, child_count, camo, lead
+	var stats = BloonStats.new(700, BASE_RED_SPEED * 0.25, 1, _get_moab_stats(), 4, false, false)
+	stats.bloon_type = "BFB"
+	stats.moab_class = true
+	return stats
 
 func _get_zomg_stats() -> BloonStats:
-	# health, speed, cash, child_stats, child_count, camo, lead, type, fortified, regrow, immunities, moab
-	return BloonStats.new(
-		4000, BASE_RED_SPEED * 0.18, 1, _get_bfb_stats(), 4, false, false, "ZOMG", false, false, [], true
-	)
+	# health, speed, cash, child_stats, child_count, camo, lead
+	var stats = BloonStats.new(4000, BASE_RED_SPEED * 0.18, 1, _get_bfb_stats(), 4, false, false)
+	stats.bloon_type = "ZOMG"
+	stats.moab_class = true
+	return stats
 
 func _get_ddt_stats() -> BloonStats:
 	# Children need to be Camo Regrow Ceramics - handle this later if needed
 	# For now, just regular Ceramics
-	var child_ceramic_stats = _get_ceramic_stats()
-	child_ceramic_stats.is_camo = true
-	child_ceramic_stats.is_regrow = true # Note: Need to ensure BloonStats supports mutation or create a dedicated function
-	# health, speed, cash, child_stats, child_count, camo, lead, type, fortified, regrow, immunities, moab
-	return BloonStats.new(
-		400, BASE_RED_SPEED * 2.75, 1, child_ceramic_stats, 4, true, true, "DDT", false, false, ["Sharp", "Explosive"], true
-	)
+	var child_stats = _get_ceramic_stats()
+	child_stats.is_camo = true
+	child_stats.is_regrow = true # Note: This mutates the result of _get_ceramic_stats. Better to create fresh if needed elsewhere.
+	# health, speed, cash, child_stats, child_count, camo, lead
+	var stats = BloonStats.new(400, BASE_RED_SPEED * 2.75, 1, child_stats, 4, true, true)
+	stats.bloon_type = "DDT"
+	stats.immunities = ["Sharp", "Explosive"] # Lead + Black properties
+	stats.moab_class = true
+	return stats
 
 func _get_bad_stats() -> BloonStats:
 	# Children handled specially in bloon.gd handle_pop
-	# health, speed, cash, child_stats, child_count, camo, lead, type, fortified, regrow, immunities, moab
-	return BloonStats.new(
-		20000, BASE_RED_SPEED * 0.18, 1, null, 0, false, false, "BAD", false, false, [], true
-	)
+	# health, speed, cash, child_stats, child_count, camo, lead
+	var stats = BloonStats.new(20000, BASE_RED_SPEED * 0.18, 1, null, 0, false, false)
+	stats.bloon_type = "BAD"
+	stats.moab_class = true
+	return stats
 #endregion
 
