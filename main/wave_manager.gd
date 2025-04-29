@@ -437,6 +437,9 @@ func spawn_bloon(bloon_stats_resource: BloonStats, p_progress_ratio: float = 0.0
 		active_bloons_in_current_round -=1
 		return
 
+	# Add to scene *before* setting progress ratio or connecting signals
+	path_node.add_child(bloon_instance)
+
 	# --- NEW: Set progress ratio for children ---
 	if bloon_instance is PathFollow3D: # REMOVED: p_progress_ratio > 0.0 check
 		bloon_instance.progress_ratio = p_progress_ratio
@@ -447,9 +450,6 @@ func spawn_bloon(bloon_stats_resource: BloonStats, p_progress_ratio: float = 0.0
 	# --- NEW: Connect bloon removal signal ---
 	if not bloon_instance.bloon_removed_from_play.is_connected(_on_bloon_removed):
 		bloon_instance.bloon_removed_from_play.connect(_on_bloon_removed)
-
-	# Add to scene *after* initialization
-	path_node.add_child(bloon_instance)
 
 	# The bloon's pool_reset() should handle setting progress to 0.
 	# No further setup needed here unless you have wave-specific modifications.
