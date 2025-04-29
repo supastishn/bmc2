@@ -10,7 +10,7 @@ extends Node3D
 
 # --- Other Scene References ---
 @onready var camera: Camera3D = $Camera3D
-@onready var wave_manager: Node = $WaveManager
+# REMOVED @onready var wave_manager: Node = $WaveManager - Using autoload now
 @onready var towers_node: Node3D = $Towers
 
 # --- Placement State Variables ---
