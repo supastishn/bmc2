@@ -209,7 +209,7 @@ func create_stats(tower_name: String, upgrade_path_str: String) -> Dictionary:
 		# Base cooldown is 0.95s
 		match p2: # Apply path 2 speed boosts cumulatively
 			1: cooldown_multiplier *= 0.85 # 0.95 * 0.85 = 0.8075s
-			2: cooldown_multiplier *= 0.85 * (0.8075 / 0.95 * 0.7882) # ~0.67 total multi -> 0.6365s
+			2: # The cooldown is set directly below, no need to modify multiplier here
 			   # Simplification: Use target values directly if known
 			   # cooldown_multiplier = 0.67 # Target multiplier for T2
 			   current_tower_stats.attack_cooldown = 0.6365 # Set directly based on 020 stats
@@ -277,8 +277,8 @@ func get_upgrade_details(tower_name: String, path_index: int, tier: int) -> Dict
 
 ## --- NEW: Get base cost of a tower ---
 func get_base_cost(tower_name: String) -> int:
-	if tower_data.has(tower_name) and tower_data[tower_name].has("base") and tower_data[tower_name].base.has("cost"):
-		return tower_data[tower_name].base.cost
+	if tower_data.has(tower_name) and tower_data[tower_name].has("base") and tower_data[tower_name]["base"].has("cost"):
+		return tower_data[tower_name]["base"]["cost"]
 	else:
 		printerr("TowerFactory: Base cost not found for '", tower_name, "'")
 		return 999999 # Return high value on error
