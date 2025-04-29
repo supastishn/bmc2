@@ -66,6 +66,8 @@ func initialize_with_stats(new_stats: BloonStats):
 	stats = new_stats
 	current_health = stats.health
 	max_health = stats.health # Store the original health
+	# --- Debug: Confirm health initialization ---
+	print("Initialized Bloon '%s' with health: %d (from stats: %d)" % [stats.bloon_type if stats else "Unknown", current_health, stats.health])
 	# TODO: Optionally update mesh/material based on stats here if needed
 	# Must be slightly below 1
 	if progress_ratio >= 0.99: # Changed threshold to be closer to end
