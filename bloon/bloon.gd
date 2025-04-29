@@ -76,7 +76,7 @@ func initialize_with_stats(new_stats: BloonStats, immune_to_projectile: Object =
 		# --- Debug: Log projectile ID being added to immunity ---
 		print("Bloon '%s' adding immunity against Projectile ID: %d" % [stats.bloon_type if stats else "Unknown", immune_to_projectile.get_instance_id()])
 		_immune_to_projectiles.append(immune_to_projectile)
-		_clear_spawn_immunity.call_deferred() # Clear immunity after this frame
+		# _clear_spawn_immunity.call_deferred() # REMOVED: Don't clear immunity for permanent effect
 		# print_debug("Added immunity for %s against %s" % [stats.bloon_type if stats else "Unknown", immune_to_projectile]) # Debug
 	else:
 		# --- Debug: Log if no projectile immunity is being added ---
@@ -87,17 +87,6 @@ func initialize_with_stats(new_stats: BloonStats, immune_to_projectile: Object =
 	# Must be slightly below 1
 	if progress_ratio >= 0.99: # Changed threshold to be closer to end
 		handle_reached_end()
-
-
-# --- NEW: Clear Spawn Immunity ---
-func _clear_spawn_immunity():
-	# print_debug("Clearing spawn immunity list for %s (contained %d)" % [stats.bloon_type if stats else "Unknown", _immune_to_projectiles.size()]) # Debug
-	# --- Debug: Log IDs being cleared ---
-	var ids_to_clear = []
-	for proj in _immune_to_projectiles:
-		ids_to_clear.append(proj.get_instance_id() if is_instance_valid(proj) else "Invalid")
-	print("Bloon '%s' clearing spawn immunity for Projectile IDs: %s" % [stats.bloon_type if stats else "Unknown", ids_to_clear])
-	_immune_to_projectiles.clear()
 
 
 func take_damage(amount: int, source_projectile: Object = null): # ADDED source_projectile param
