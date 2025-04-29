@@ -209,7 +209,7 @@ func create_stats(tower_name: String, upgrade_path_str: String) -> Dictionary:
 		# Base cooldown is 0.95s
 		match p2: # Apply path 2 speed boosts cumulatively
 			1: cooldown_multiplier *= 0.85 # 0.95 * 0.85 = 0.8075s
-			2: # The cooldown is set directly below, no need to modify multiplier here
+			2: # Cooldown is set directly below (0.6365s). Multiplier logic bypassed for T2+.
 			   # Simplification: Use target values directly if known
 			   # cooldown_multiplier = 0.67 # Target multiplier for T2
 			   current_tower_stats.attack_cooldown = 0.6365 # Set directly based on 020 stats
