@@ -165,62 +165,77 @@ func attack(target: Node3D):
 		printerr("Attack cancelled: Missing stats or projectile scene.")
 		return
 
-	var projectile_instance: Node = null
-	if not _projectile_pool.is_empty():
-		projectile_instance = _projectile_pool.pop_back()
-		# Reset should be called *after* retrieving from pool
-		if projectile_instance.has_method("pool_reset"):
-			projectile_instance.pool_reset()
-		# print_debug("Reusing projectile from pool.") # Optional debug
-	else:
-		printerr("Tower %s projectile pool empty! Instantiating fallback." % name)
-		projectile_instance = stats.projectile_scene.instantiate()
-		# --- FIX START ---
-		# Check if it's the correct type and has the necessary methods/script
-		if projectile_instance is Area3D and projectile_instance.has_method("set_stats") and projectile_instance.has_method("pool_reset"):
-			projectile_instance.owner_tower = self
-			projectile_instance.set_stats(projectile_stats) # Use the method
-			# print_debug("Instantiated fallback projectile.") # Optional debug
-		# --- FIX END ---
-		else:
-			printerr("Fallback projectile instance is invalid!")
-			if is_instance_valid(projectile_instance): projectile_instance.queue_free()
-			return # Don't proceed if fallback failed
-
-	# Ensure projectile instance is valid before proceeding
-	if not is_instance_valid(projectile_instance):
-		printerr("Attack failed: Projectile instance became invalid.")
-		# Attempt to return it to pool if possible? Or just log error.
-		return
-
 	# --- Aim and Position ---
 	# Ensure target is still valid before looking at it
 	if not is_instance_valid(target):
 		printerr("Attack cancelled: Target became invalid before firing.")
-		# Return projectile to pool without firing
-		_return_projectile_to_pool(projectile_instance)
+		# No projectile instance retrieved yet, just return
 		return
 
 	look_at(target.global_position, Vector3.UP) # Aim the tower
-	# Add projectile to the main scene tree (or a dedicated projectiles node)
-	get_tree().root.add_child(projectile_instance)
-	# Set projectile's position/rotation *after* adding to tree
-	projectile_instance.global_transform = projectile_spawn_point.global_transform
 
-	# --- Configure and Activate Projectile ---
-	# Set target for homing projectiles
-	if projectile_instance.has_method("set_target"):
-		projectile_instance.set_target(target)
-	# Set initial direction for non-homing
-	elif projectile_instance.has_method("initialize_direction"):
-		# Use the projectile's forward direction after being placed
-		projectile_instance.initialize_direction(projectile_instance.global_transform.basis.z)
+	# --- Fire Projectiles ---
+	var num_projectiles = stats.projectiles_per_shot
+	var base_spread_angle_rad = deg_to_rad(stats.spread_angle)
 
-	# Activate the projectile (e.g., start its lifetime timer)
-	if projectile_instance.has_method("activate"):
-		projectile_instance.activate()
-	else:
-		printerr("Projectile %s missing activate() method!" % projectile_instance.name)
+	for i in range(num_projectiles):
+		var projectile_instance: Node = null
+
+		# Get projectile from pool or instantiate fallback
+		if not _projectile_pool.is_empty():
+			projectile_instance = _projectile_pool.pop_back()
+			if projectile_instance.has_method("pool_reset"):
+				projectile_instance.pool_reset()
+			# print_debug("Reusing projectile %d from pool." % i) # Optional debug
+		else:
+			printerr("Tower %s projectile pool empty! Instantiating fallback for projectile %d." % [name, i])
+			projectile_instance = stats.projectile_scene.instantiate()
+			if projectile_instance is Area3D and projectile_instance.has_method("set_stats") and projectile_instance.has_method("pool_reset"):
+				projectile_instance.owner_tower = self
+				projectile_instance.set_stats(projectile_stats)
+				# print_debug("Instantiated fallback projectile %d." % i) # Optional debug
+			else:
+				printerr("Fallback projectile instance %d is invalid!" % i)
+				if is_instance_valid(projectile_instance): projectile_instance.queue_free()
+				continue # Try next projectile if fallback failed
+
+		# Double check validity after retrieval/instantiation
+		if not is_instance_valid(projectile_instance):
+			printerr("Attack failed: Projectile instance %d became invalid." % i)
+			continue
+
+		# Add projectile to the main scene tree
+		get_tree().root.add_child(projectile_instance)
+
+		# Set initial position/rotation from spawn point
+		projectile_instance.global_transform = projectile_spawn_point.global_transform
+
+		# Apply spread rotation if multiple projectiles
+		if num_projectiles > 1:
+			# Calculate angle for this specific projectile
+			# Angle ranges from -spread/2 to +spread/2
+			var angle_offset = 0.0
+			if num_projectiles > 1: # Avoid division by zero for single projectile
+				angle_offset = lerp(-base_spread_angle_rad / 2.0, base_spread_angle_rad / 2.0, float(i) / (num_projectiles - 1))
+
+			# Apply rotation around the tower's Y-axis (UP)
+			# Note: We rotate the projectile itself after placing it at the spawn point
+			projectile_instance.rotate_object_local(Vector3.UP, angle_offset)
+
+		# --- Configure and Activate Projectile ---
+		# Set target for homing projectiles
+		if projectile_instance.has_method("set_target"):
+			projectile_instance.set_target(target)
+		# Set initial direction for non-homing
+		elif projectile_instance.has_method("initialize_direction"):
+			# Use the projectile's forward direction *after* applying spread
+			projectile_instance.initialize_direction(projectile_instance.global_transform.basis.z)
+
+		# Activate the projectile (e.g., start its lifetime timer)
+		if projectile_instance.has_method("activate"):
+			projectile_instance.activate()
+		else:
+			printerr("Projectile %s missing activate() method!" % projectile_instance.name)
 
 	# --- Start Cooldown ---
 	cooldown_timer.start()
