@@ -109,11 +109,11 @@ func take_damage(amount: int, source_projectile: Object = null): # ADDED source_
 	# Print new health
 	print("Bloon '%s' health after damage: %d" % [stats.bloon_type if stats else "Unknown", current_health])
 	if current_health <= 0:		
-		handle_pop()
+		handle_pop(source_projectile) # Pass the projectile that caused the pop
 
 
-func handle_pop():
-	if is_released: return
+func handle_pop(source_projectile_that_popped_me: Object): # ADDED parameter
+	if is_released: return # Prevent double processing if pop happens quickly
 	if stats:
 		GameManager.increase_cash(stats.cash_value)
 
