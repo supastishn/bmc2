@@ -1,7 +1,7 @@
 # File: res://main/wave_manager.gd
 extends Node
 
-#export var base_bloon_scene: PackedScene = preload("res://bloon/bloon.tscn")
+@export var base_bloon_scene: PackedScene = preload("res://bloon/bloon.tscn")
 @export var inter_wave_delay: float = 3.0  # seconds to wait before next wave
 const BLOON_STATS_SCRIPT = preload("res://stats/bloon_stats.gd")
 
@@ -14,7 +14,7 @@ var path_node: Path3D # This will be set by main.gd
 var raw_wave_data: Dictionary = {}
 var current_wave_data: Array = []
 
-const STATS_FUNC_MAP = {
+var STATS_FUNC_MAP = {
   "red": _get_red_stats,   "blue": _get_blue_stats,
   "green": _get_green_stats, "yellow": _get_yellow_stats,
   "pink": _get_pink_stats, "black": _get_black_stats,
@@ -48,9 +48,10 @@ func _ready():
 	if f:
 		var txt = f.get_as_text()
 		f.close()
-		var j = JSON.parse(txt)
-		if j.error == OK:
-			raw_wave_data = j.result        # now a Dictionary keyed by "1"… "140"
+		var json = JSON.new()
+		var j = json.parse(txt)
+		if j == OK:
+			raw_wave_data = json.data        # now a Dictionary keyed by "1"… "140"
 			# build current_wave_data in numeric order
 			var round_nums = raw_wave_data.keys().map(func(k): return int(k))
 			round_nums.sort()
