@@ -50,10 +50,13 @@ func _ready():
 		f.close()
 		var j = JSON.parse(txt)
 		if j.error == OK:
-			raw_wave_data = j.result
-			for wave in raw_wave_data:
-				var conv : Array = []
-				for entry in wave:
+			raw_wave_data = j.result        # now a Dictionary keyed by "1"… "140"
+			# build current_wave_data in numeric order
+			var round_nums = raw_wave_data.keys().map(func(k): return int(k)).sort()
+			for num in round_nums:
+				var entries = raw_wave_data[str(num)]
+				var conv: Array = []
+				for entry in entries:
 					var parts = entry.split(",")
 					var key = parts[0].strip_edges().to_lower()
 					var cnt = int(parts[1])
@@ -62,7 +65,7 @@ func _ready():
 					if fn:
 						conv.append({ "stats_func": fn, "count": cnt, "delay": dly })
 					else:
-						printerr("WaveManager: unknown wave key '", key, "' in data.")
+						printerr("WaveManager: unknown key '", key, "' in data round ", num)
 				current_wave_data.append(conv)
 		else:
 			printerr("WaveManager: JSON parse error ", j.error)
