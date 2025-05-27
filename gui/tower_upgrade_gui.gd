@@ -43,9 +43,9 @@ func display_tower(tower: Node):
 		var current_tier = tower.get_upgrade_level(path_index)
 		var next_tier = current_tier + 1
 
-		# Always clear any prior upgrade_requested binding in one call
-		button
-
+		# Disconnect any previous “pressed” handler so we don’t double-connect
+		if button.is_connected("pressed", self, "_on_upgrade_button_pressed"):
+			button.disconnect("pressed", self, "_on_upgrade_button_pressed")
 
 		if tower.is_path_locked(path_index) or next_tier > 5:
 			button.disabled = true
