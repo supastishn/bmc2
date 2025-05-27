@@ -23,8 +23,42 @@ var STATS_FUNC_MAP = {
   "purple": _get_purple_stats, "ceramic": _get_ceramic_stats,
   "moab": _get_moab_stats, "bfb": _get_bfb_stats,
   "zomg": _get_zomg_stats, "ddt": _get_ddt_stats,
-  "bad": _get_bad_stats
-  # … add any camo/regrow variants you use …
+  "bad": _get_bad_stats,
+
+  # --- FORTIFIED variants ---
+  "fortified_lead":   _get_fortified_lead_stats,
+  "fortified_ceramic":_get_fortified_ceramic_stats,
+  "fortified_moab":   _get_fortified_moab_stats,
+  "fortified_bfb":    _get_fortified_bfb_stats,
+  "fortified_zomg":   _get_fortified_zomg_stats,
+  "fortified_ddt":    _get_fortified_ddt_stats,
+  "fortified_bad":    _get_fortified_bad_stats,
+
+  # --- CAMO variants ---
+  "camo_red":     _get_camo_red_stats,
+  "camo_blue":    _get_camo_blue_stats,
+  "camo_green":   _get_camo_green_stats,
+  "camo_yellow":  _get_camo_yellow_stats,
+  "camo_pink":    _get_camo_pink_stats,
+  "camo_black":   _get_camo_black_stats,
+  "camo_white":   _get_camo_white_stats,
+  "camo_lead":    _get_camo_lead_stats,
+  "camo_zebra":   _get_camo_zebra_stats,
+  "camo_rainbow": _get_camo_rainbow_stats,
+  "camo_purple":  _get_camo_purple_stats,
+  "camo_ceramic": _get_camo_ceramic_stats,
+
+  # --- MOAB-class CAMO (not present by default—you may want to add these helpers) ---
+  "camo_moab":    _get_camo_moab_stats,
+  "camo_bfb":     _get_camo_bfb_stats,
+  "camo_zomg":    _get_camo_zomg_stats,
+
+  # --- FORTIFIED + CAMO crossover waves (rounds 126–133) ---
+  "fortified_camo_lead":     _get_fortified_camo_lead_stats,
+  "fortified_camo_ceramic":  _get_fortified_camo_ceramic_stats,
+  "fortified_camo_moab":     _get_fortified_camo_moab_stats,
+  "fortified_camo_bfb":      _get_fortified_camo_bfb_stats,
+  "fortified_camo_zomg":     _get_fortified_camo_zomg_stats,
 }
 
 var current_wave_index = 0
@@ -426,6 +460,22 @@ func _get_camo_black_stats() -> BloonStats: var stats = _get_black_stats(); stat
 func _get_camo_white_stats() -> BloonStats: var stats = _get_white_stats(); stats.is_camo = true; return stats
 func _get_camo_zebra_stats() -> BloonStats: var stats = _get_zebra_stats(); stats.is_camo = true; return stats
 func _get_camo_rainbow_stats() -> BloonStats: var stats = _get_rainbow_stats(); stats.is_camo = true; return stats
+
+# --- MOAB-class pure camo helpers ---
+func _get_camo_moab_stats() -> BloonStats:
+    var s = _get_moab_stats()
+    s.is_camo = true
+    return s
+
+func _get_camo_bfb_stats() -> BloonStats:
+    var s = _get_bfb_stats()
+    s.is_camo = true
+    return s
+
+func _get_camo_zomg_stats() -> BloonStats:
+    var s = _get_zomg_stats()
+    s.is_camo = true
+    return s
 
 # --- Regrow Stat Functions ---
 func _get_regrow_lead_stats() -> BloonStats:
