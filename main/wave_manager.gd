@@ -148,7 +148,8 @@ func start_next_wave():
 
 func _on_spawn_timer_timeout():
 	# Check if spawning for the current wave is actually finished
-	if current_bloon_spawn_index >= bloons_in_wave.size():
+	# +1 is needed because size is 1 based, index is 0 based
+	if current_bloon_spawn_index + 1 >= bloons_in_wave.size():
 		if not spawning_complete_for_current_round:
 			spawning_complete_for_current_round = true
 			print("Wave ", current_wave_index + 1, " spawning finished.")
@@ -226,8 +227,11 @@ func _on_bloon_removed():
 # --- NEW: Check if the Round Should End ---
 # --- RENAMED: Check if the Round *field* is clear ---
 func _check_round_clear():
+	print('Check clear')
+	
 	# Field is clear if spawning is done AND there are no active bloons
 	if spawning_complete_for_current_round and active_bloons_in_current_round == 0:
+		await get_tree().process_frame
 		print("DEBUG: Round ended – all bloons cleared for wave ", current_wave_index + 1)
 		emit_signal("wave_cleared", current_wave_index + 1)
 

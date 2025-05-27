@@ -216,7 +216,7 @@ func _update_material():
 	if BLOON_MATERIALS.has(base_type):
 		material_to_apply = BLOON_MATERIALS[base_type]
 	else:
-		print_warning("No material found for bloon type: ", base_type, " on node ", name)
+		printerr("No material found for bloon type: ", base_type, " on node ", name)
 		# Fallback to the mesh's default material by setting override to null
 		material_to_apply = null
 
