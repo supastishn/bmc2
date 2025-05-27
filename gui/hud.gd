@@ -11,7 +11,7 @@ func _ready():
 	GameManager.cash_changed.connect(_on_game_manager_cash_changed)
 	GameManager.round_changed.connect(_on_game_manager_round_changed) # NEW Connection
 
-	next_wave_button.hide()
+	next_wave_button.show()    # ← show it immediately so player can start wave 1
 	next_wave_button.pressed.connect(_on_next_wave_pressed)
 	WaveManager.wave_spawning_complete.connect(_on_wave_ready)
 	WaveManager.wave_cleared.connect(_on_wave_ready)
