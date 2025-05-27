@@ -158,10 +158,8 @@ func _handle_world_click(mouse_pos: Vector2):
 		# This case should ideally not happen with correct setup, but if it does, do nothing.
 		# print_debug("Clicked on unexpected collider on world mask layers: ", collider) # Debug
 
-	# --- Else: Raycast hit nothing (empty space) ---
-	# Do nothing - clicking empty space no longer deselects.
-	# print_debug("Clicked on empty space - Doing nothing") # Debug
-	pass
+	# --- Else: Raycast hit nothing (or it was the range Area3D) → deselect tower
+	deselect_tower()
 
 
 func select_tower(tower: Node3D):

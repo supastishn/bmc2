@@ -3,7 +3,7 @@ extends Control
 @onready var lives_label: Label =  %LivesLabel # Adjust path as needed
 @onready var cash_label: Label = %CashLabel   # Adjust path as needed
 @onready var round_label: Label = %RoundLabel # NEW Round label
-@onready var next_wave_button: Button = %NextWaveButton
+@onready var next_wave_button: Button = $NextWaveButton
 
 func _ready():
 	# Connect to GameManager signals
