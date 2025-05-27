@@ -1,6 +1,9 @@
 # File: res://main/wave_manager.gd
 extends Node
 
+signal wave_spawning_complete(round_number: int)
+signal wave_cleared(round_number: int)
+
 @export var base_bloon_scene: PackedScene = preload("res://bloon/bloon.tscn")
 @export var inter_wave_delay: float = 3.0  # seconds to wait before next wave
 const BLOON_STATS_SCRIPT = preload("res://stats/bloon_stats.gd")
@@ -142,12 +145,11 @@ func start_next_wave():
 func _on_spawn_timer_timeout():
 	# Check if spawning for the current wave is actually finished
 	if current_bloon_spawn_index >= bloons_in_wave.size():
-		if not spawning_complete_for_current_round: # Only set flag once
-			print("Wave ", current_wave_index + 1, " spawning finished.")
+		if not spawning_complete_for_current_round:
 			spawning_complete_for_current_round = true
-			current_wave_index += 1 # Increment for the next wave
-			start_next_wave() # Immediately trigger the next wave setup
-		return # Stop spawning for this iteration
+			print("Wave ", current_wave_index + 1, " spawning finished.")
+			emit_signal("wave_spawning_complete", current_wave_index + 1)
+		return
 
 	# Spawn the next bloon in the list
 	var bloon_info = bloons_in_wave[current_bloon_spawn_index]
@@ -160,22 +162,6 @@ func _on_spawn_timer_timeout():
 	if current_bloon_spawn_index < bloons_in_wave.size():
 		spawn_timer.wait_time = bloon_info["delay"] # Use delay from the bloon just spawned
 		spawn_timer.start()
-	else:
-		# Last bloon spawned → schedule next wave after a delay
-		print("Wave ", current_wave_index + 1, " spawning finished (last bloon). Waiting ", inter_wave_delay, "s before next wave.")
-		spawning_complete_for_current_round = true
-		current_wave_index += 1
-		spawn_timer.wait_time = inter_wave_delay
-		spawn_timer.one_shot = true
-		spawn_timer.start()
-
-
-	# This else block might be redundant now due to the check at the start
-	# else:
-		# Wave finished spawning, start timer for the next wave
-		# print("Wave ", wave_index + 1, " spawning complete.")
-		# wave_index += 1
-		# wave_timer.start()
 
 
 func spawn_bloon(bloon_stats_resource: BloonStats, p_progress_ratio: float = 0.0, immune_to_projectile: Object = null): # Added progress ratio and immunity params
@@ -239,7 +225,7 @@ func _check_round_clear():
 	# Field is clear if spawning is complete AND no active bloons remain
 	if spawning_complete_for_current_round and active_bloons_in_current_round == 0:
 		print("All bloons cleared for wave ", current_wave_index + 1)
-		# No longer advances round or starts timer here
+		emit_signal("wave_cleared", current_wave_index + 1)
 
 # --- NEW: Child Spawning Handler ---
 func _on_bloon_spawn_children(children_stats_array: Array, spawn_progress_ratio: float, popping_projectile: Object): # Added popping_projectile param
