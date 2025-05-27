@@ -213,7 +213,7 @@ func spawn_bloon(bloon_stats_resource: BloonStats, p_progress_ratio: float = 0.0
 	# No further setup needed here unless you have wave-specific modifications.
 
 # --- NEW: Handle Bloon Removal ---
-func _on_bloon_removed(...):
+func _on_bloon_removed():
 	# DEBUG log each removal
 	print("DEBUG: Bloon removed, active before = ", active_bloons_in_current_round)
 	if active_bloons_in_current_round > 0:
