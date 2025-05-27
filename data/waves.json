@@ -1,0 +1,8 @@
+[
+  ["red,20,1.0"],
+  ["red,35,0.8"],
+  ["red,25,0.7","blue,5,1.0"],
+  ["red,35,0.5","blue,18,0.7"],
+  ["red,5,0.8","blue,30,0.6"]
+  // … add all 140 rounds here in the same style …
+]

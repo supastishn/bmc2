@@ -10,7 +10,23 @@ var path_node: Path3D # This will be set by main.gd
 @onready var spawn_timer: Timer = $SpawnTimer
 #@onready var wave_timer: Timer = $WaveTimer # Removed - waves advance immediately after spawning finishes
 
-var current_wave_data = []
+# Short‐hand loader
+var raw_wave_data: Array = []
+var current_wave_data: Array = []
+
+const STATS_FUNC_MAP = {
+  "red": _get_red_stats,   "blue": _get_blue_stats,
+  "green": _get_green_stats, "yellow": _get_yellow_stats,
+  "pink": _get_pink_stats, "black": _get_black_stats,
+  "white": _get_white_stats, "lead": _get_lead_stats,
+  "zebra": _get_zebra_stats, "rainbow": _get_rainbow_stats,
+  "purple": _get_purple_stats, "ceramic": _get_ceramic_stats,
+  "moab": _get_moab_stats, "bfb": _get_bfb_stats,
+  "zomg": _get_zomg_stats, "ddt": _get_ddt_stats,
+  "bad": _get_bad_stats
+  # … add any camo/regrow variants you use …
+}
+
 var current_wave_index = 0
 var bloons_in_wave: Array[Dictionary] = [] # Holds {"stats_func": Callable, "delay": float}
 var current_bloon_spawn_index: int = 0
@@ -27,318 +43,32 @@ func _ready():
 	spawn_timer.one_shot = true # Spawn one bloon per timeout
 	if not spawn_timer.timeout.is_connected(_on_spawn_timer_timeout): spawn_timer.timeout.connect(_on_spawn_timer_timeout)
 
-	# Wave Data Structure using stats functions
-	# 0-indexed array, where index `i` corresponds to round `i+1`
-	current_wave_data = [
-		# ... Add rounds 1 through 122 here if needed ...
-		# --- Rounds 1-122 --- (Based on Standard BTD6 Rounds, delays are estimates)
-		# Round 1 (Index 0): 20 Red
-		[ {"stats_func": _get_blue_stats, "count": 20, "delay": 1.0} ],
-		# Round 2 (Index 1): 35 Red
-		[ {"stats_func": _get_red_stats, "count": 35, "delay": 0.8} ],
-		# Round 3 (Index 2): 25 Red, 5 Blue
-		[ {"stats_func": _get_red_stats, "count": 25, "delay": 0.7}, {"stats_func": _get_blue_stats, "count": 5, "delay": 1.0} ],
-		# Round 4 (Index 3): 35 Red, 18 Blue
-		[ {"stats_func": _get_red_stats, "count": 35, "delay": 0.5}, {"stats_func": _get_blue_stats, "count": 18, "delay": 0.7} ],
-		# Round 5 (Index 4): 5 Red, 30 Blue
-		[ {"stats_func": _get_red_stats, "count": 5, "delay": 0.8}, {"stats_func": _get_blue_stats, "count": 30, "delay": 0.6} ],
-		# Round 6 (Index 5): 15 Red, 15 Blue, 4 Green
-		[ {"stats_func": _get_red_stats, "count": 15, "delay": 0.5}, {"stats_func": _get_blue_stats, "count": 15, "delay": 0.5}, {"stats_func": _get_green_stats, "count": 4, "delay": 1.5} ],
-		# Round 7 (Index 6): 20 Red, 20 Blue, 5 Green
-		[ {"stats_func": _get_red_stats, "count": 20, "delay": 0.4}, {"stats_func": _get_blue_stats, "count": 20, "delay": 0.4}, {"stats_func": _get_green_stats, "count": 5, "delay": 1.2} ],
-		# Round 8 (Index 7): 10 Red, 20 Blue, 14 Green
-		[ {"stats_func": _get_red_stats, "count": 10, "delay": 0.5}, {"stats_func": _get_blue_stats, "count": 20, "delay": 0.4}, {"stats_func": _get_green_stats, "count": 14, "delay": 0.7} ],
-		# Round 9 (Index 8): 30 Green
-		[ {"stats_func": _get_green_stats, "count": 30, "delay": 0.5} ],
-		# Round 10 (Index 9): 102 Blue
-		[ {"stats_func": _get_blue_stats, "count": 102, "delay": 0.2} ],
-		# Round 11 (Index 10): 10 Red, 12 Blue, 15 Green, 3 Yellow
-		[ {"stats_func": _get_red_stats, "count": 10, "delay": 0.4}, {"stats_func": _get_blue_stats, "count": 12, "delay": 0.4}, {"stats_func": _get_green_stats, "count": 15, "delay": 0.4}, {"stats_func": _get_yellow_stats, "count": 3, "delay": 1.0} ],
-		# Round 12 (Index 11): 15 Blue, 10 Green, 5 Yellow
-		[ {"stats_func": _get_blue_stats, "count": 15, "delay": 0.4}, {"stats_func": _get_green_stats, "count": 10, "delay": 0.6}, {"stats_func": _get_yellow_stats, "count": 5, "delay": 0.8} ],
-		# Round 13 (Index 12): 50 Green, 23 Yellow
-		[ {"stats_func": _get_green_stats, "count": 50, "delay": 0.2}, {"stats_func": _get_yellow_stats, "count": 23, "delay": 0.4} ],
-		# Round 14 (Index 13): 49 Red, 15 Blue, 10 Green, 10 Yellow
-		[ {"stats_func": _get_red_stats, "count": 49, "delay": 0.3}, {"stats_func": _get_blue_stats, "count": 15, "delay": 0.4}, {"stats_func": _get_green_stats, "count": 10, "delay": 0.5}, {"stats_func": _get_yellow_stats, "count": 10, "delay": 0.6} ],
-		# Round 15 (Index 14): 20 Red, 15 Blue, 12 Green, 10 Yellow, 5 Pink
-		[ {"stats_func": _get_red_stats, "count": 20, "delay": 0.3}, {"stats_func": _get_blue_stats, "count": 15, "delay": 0.3}, {"stats_func": _get_green_stats, "count": 12, "delay": 0.3}, {"stats_func": _get_yellow_stats, "count": 10, "delay": 0.4}, {"stats_func": _get_pink_stats, "count": 5, "delay": 0.8} ],
-		# Round 16 (Index 15): 40 Green, 18 Yellow
-		[ {"stats_func": _get_green_stats, "count": 40, "delay": 0.3}, {"stats_func": _get_yellow_stats, "count": 18, "delay": 0.5} ],
-		# Round 17 (Index 16): 12 Regrow Yellow
-		[ {"stats_func": _get_regrow_yellow_stats, "count": 12, "delay": 0.7} ],
-		# Round 18 (Index 17): 80 Green
-		[ {"stats_func": _get_green_stats, "count": 80, "delay": 0.2} ],
-		# Round 19 (Index 18): 10 Green, 5 Yellow, 15 Pink
-		[ {"stats_func": _get_green_stats, "count": 10, "delay": 0.5}, {"stats_func": _get_yellow_stats, "count": 5, "delay": 0.6}, {"stats_func": _get_pink_stats, "count": 15, "delay": 0.4} ],
-		# Round 20 (Index 19): 6 Black
-		[ {"stats_func": _get_black_stats, "count": 6, "delay": 1.0} ],
-		# Round 21 (Index 20): 40 Yellow, 14 Pink
-		[ {"stats_func": _get_yellow_stats, "count": 40, "delay": 0.3}, {"stats_func": _get_pink_stats, "count": 14, "delay": 0.5} ],
-		# Round 22 (Index 21): 8 White
-		[ {"stats_func": _get_white_stats, "count": 8, "delay": 1.0} ],
-		# Round 23 (Index 22): 7 Black, 7 White
-		[ {"stats_func": _get_black_stats, "count": 7, "delay": 0.8}, {"stats_func": _get_white_stats, "count": 7, "delay": 0.8} ],
-		# Round 24 (Index 23): 1 Camo Green
-		[ {"stats_func": _get_camo_green_stats, "count": 1, "delay": 0.0} ],
-		# Round 25 (Index 24): 25 Yellow, 10 Purple
-		[ {"stats_func": _get_yellow_stats, "count": 25, "delay": 0.3}, {"stats_func": _get_purple_stats, "count": 10, "delay": 0.5} ],
-		# Round 26 (Index 25): 23 Pink, 4 Zebra
-		[ {"stats_func": _get_pink_stats, "count": 23, "delay": 0.4}, {"stats_func": _get_zebra_stats, "count": 4, "delay": 1.2} ],
-		# Round 27 (Index 26): 100 Red, 60 Blue, 45 Green, 45 Yellow
-		[ {"stats_func": _get_red_stats, "count": 100, "delay": 0.1}, {"stats_func": _get_blue_stats, "count": 60, "delay": 0.1}, {"stats_func": _get_green_stats, "count": 45, "delay": 0.1}, {"stats_func": _get_yellow_stats, "count": 45, "delay": 0.1} ],
-		# Round 28 (Index 27): 6 Lead
-		[ {"stats_func": _get_lead_stats, "count": 6, "delay": 1.0} ],
-		# Round 29 (Index 28): 50 Yellow
-		[ {"stats_func": _get_yellow_stats, "count": 50, "delay": 0.3} ],
-		# Round 30 (Index 29): 9 Lead
-		[ {"stats_func": _get_lead_stats, "count": 9, "delay": 0.8} ],
-		# Round 31 (Index 30): 8 Black, 8 White, 8 Zebra
-		[ {"stats_func": _get_black_stats, "count": 8, "delay": 0.6}, {"stats_func": _get_white_stats, "count": 8, "delay": 0.6}, {"stats_func": _get_zebra_stats, "count": 8, "delay": 0.8} ],
-		# Round 32 (Index 31): 15 Black, 10 White, 10 Purple
-		[ {"stats_func": _get_black_stats, "count": 15, "delay": 0.4}, {"stats_func": _get_white_stats, "count": 10, "delay": 0.5}, {"stats_func": _get_purple_stats, "count": 10, "delay": 0.6} ],
-		# Round 33 (Index 32): 20 Camo Red
-		[ {"stats_func": _get_camo_red_stats, "count": 20, "delay": 0.5} ],
-		# Round 34 (Index 33): 120 Yellow, 8 Zebra
-		[ {"stats_func": _get_yellow_stats, "count": 120, "delay": 0.1}, {"stats_func": _get_zebra_stats, "count": 8, "delay": 0.8} ],
-		# Round 35 (Index 34): 35 Pink, 30 Black, 25 White, 5 Rainbow
-		[ {"stats_func": _get_pink_stats, "count": 35, "delay": 0.2}, {"stats_func": _get_black_stats, "count": 30, "delay": 0.3}, {"stats_func": _get_white_stats, "count": 25, "delay": 0.4}, {"stats_func": _get_rainbow_stats, "count": 5, "delay": 1.0} ],
-		# Round 36 (Index 35): 120 Regrow Pink
-		[ {"stats_func": _get_regrow_pink_stats, "count": 120, "delay": 0.1} ],
-		# Round 37 (Index 36): 25 Black, 25 White, 7 Camo White, 10 Lead
-		[ {"stats_func": _get_black_stats, "count": 25, "delay": 0.3}, {"stats_func": _get_white_stats, "count": 25, "delay": 0.3}, {"stats_func": _get_camo_white_stats, "count": 7, "delay": 0.8}, {"stats_func": _get_lead_stats, "count": 10, "delay": 0.6} ],
-		# Round 38 (Index 37): 42 Pink, 17 White, 10 Lead, 10 Zebra, 2 Ceramic
-		[ {"stats_func": _get_pink_stats, "count": 42, "delay": 0.2}, {"stats_func": _get_white_stats, "count": 17, "delay": 0.3}, {"stats_func": _get_lead_stats, "count": 10, "delay": 0.5}, {"stats_func": _get_zebra_stats, "count": 10, "delay": 0.6}, {"stats_func": _get_ceramic_stats, "count": 2, "delay": 2.0} ],
-		# Round 39 (Index 38): 10 Black, 10 White, 20 Zebra, 18 Rainbow
-		[ {"stats_func": _get_black_stats, "count": 10, "delay": 0.4}, {"stats_func": _get_white_stats, "count": 10, "delay": 0.4}, {"stats_func": _get_zebra_stats, "count": 20, "delay": 0.3}, {"stats_func": _get_rainbow_stats, "count": 18, "delay": 0.5} ],
-		# Round 40 (Index 39): 1 MOAB
-		[ {"stats_func": _get_moab_stats, "count": 1, "delay": 0.0} ],
-		# Round 41 (Index 40): 60 Black, 70 Zebra
-		[ {"stats_func": _get_black_stats, "count": 60, "delay": 0.1}, {"stats_func": _get_zebra_stats, "count": 70, "delay": 0.1} ],
-		# Round 42 (Index 41): 6 Camo Rainbow, 6 Regrow Rainbow
-		[ {"stats_func": _get_camo_rainbow_stats, "count": 6, "delay": 0.8}, {"stats_func": _get_regrow_rainbow_stats, "count": 6, "delay": 0.8} ],
-		# Round 43 (Index 42): 10 Rainbow, 7 Ceramic
-		[ {"stats_func": _get_rainbow_stats, "count": 10, "delay": 0.5}, {"stats_func": _get_ceramic_stats, "count": 7, "delay": 1.0} ],
-		# Round 44 (Index 43): 35 Zebra
-		[ {"stats_func": _get_zebra_stats, "count": 35, "delay": 0.3} ],
-		# Round 45 (Index 44): 75 Pink, 10 Purple, 4 Fortified Lead
-		[ {"stats_func": _get_pink_stats, "count": 75, "delay": 0.1}, {"stats_func": _get_purple_stats, "count": 10, "delay": 0.5}, {"stats_func": _get_fortified_lead_stats, "count": 4, "delay": 1.2} ],
-		# Round 46 (Index 45): 1 Fortified Ceramic
-		[ {"stats_func": _get_fortified_ceramic_stats, "count": 1, "delay": 0.0} ],
-		# Round 47 (Index 46): 70 Camo Pink, 12 Ceramic
-		[ {"stats_func": _get_camo_pink_stats, "count": 70, "delay": 0.1}, {"stats_func": _get_ceramic_stats, "count": 12, "delay": 0.6} ],
-		# Round 48 (Index 47): 30 Camo Regrow Pink, 40 Regrow Purple, 10 Fortified Lead
-		[ {"stats_func": _get_camo_regrow_pink_stats, "count": 30, "delay": 0.3}, {"stats_func": _get_regrow_purple_stats, "count": 40, "delay": 0.3} ],
-		# Round 49 (Index 48): 343 Green, 20 Zebra, 20 Rainbow, 10 Ceramic, 18 Fortified Lead 
-		# Note: Green count reduced for sanity, original is high RBE
-		[ {"stats_func": _get_green_stats, "count": 150, "delay": 0.05}, {"stats_func": _get_zebra_stats, "count": 20, "delay": 0.3}, {"stats_func": _get_rainbow_stats, "count": 20, "delay": 0.3}, {"stats_func": _get_ceramic_stats, "count": 10, "delay": 0.5}, {"stats_func": _get_fortified_lead_stats, "count": 18, "delay": 0.4} ],
-		# Round 50 (Index 49): 20 Red, 5 Lead, 8 Ceramic, 2 MOAB
-		[ {"stats_func": _get_red_stats, "count": 20, "delay": 0.2}, {"stats_func": _get_lead_stats, "count": 5, "delay": 0.8}, {"stats_func": _get_ceramic_stats, "count": 8, "delay": 0.7}, {"stats_func": _get_moab_stats, "count": 2, "delay": 3.0} ],
-		# --- Rounds 51-122 ---
-		# Round 51 (Index 50): 10 Ceramic, 10 Regrow Ceramic
-		[ {"stats_func": _get_ceramic_stats, "count": 10, "delay": 0.8}, {"stats_func": _get_regrow_ceramic_stats, "count": 10, "delay": 0.8} ],
-		# Round 52 (Index 51): 10 Rainbow, 15 Ceramic, 2 MOAB
-		[ {"stats_func": _get_rainbow_stats, "count": 10, "delay": 0.4}, {"stats_func": _get_ceramic_stats, "count": 15, "delay": 0.6}, {"stats_func": _get_moab_stats, "count": 2, "delay": 2.5} ],
-		# Round 53 (Index 52): 80 Camo Pink, 3 MOAB
-		[ {"stats_func": _get_camo_pink_stats, "count": 80, "delay": 0.1}, {"stats_func": _get_moab_stats, "count": 3, "delay": 2.0} ],
-		# Round 54 (Index 53): 35 Ceramic, 2 MOAB
-		[ {"stats_func": _get_ceramic_stats, "count": 35, "delay": 0.3}, {"stats_func": _get_moab_stats, "count": 2, "delay": 2.0} ],
-		# Round 55 (Index 54): 40 Ceramic, 1 MOAB
-		[ {"stats_func": _get_ceramic_stats, "count": 40, "delay": 0.2}, {"stats_func": _get_moab_stats, "count": 1, "delay": 3.0} ],
-		# Round 56 (Index 55): 40 Camo Rainbow, 1 MOAB
-		[ {"stats_func": _get_camo_rainbow_stats, "count": 40, "delay": 0.2}, {"stats_func": _get_moab_stats, "count": 1, "delay": 3.0} ],
-		# Round 57 (Index 56): 40 Rainbow, 2 MOAB
-		[ {"stats_func": _get_rainbow_stats, "count": 40, "delay": 0.2}, {"stats_func": _get_moab_stats, "count": 2, "delay": 2.0} ],
-		# Round 58 (Index 57): 15 Ceramic, 10 Fortified Ceramic, 2 MOAB
-		[ {"stats_func": _get_ceramic_stats, "count": 15, "delay": 0.4}, {"stats_func": _get_fortified_ceramic_stats, "count": 10, "delay": 0.6}, {"stats_func": _get_moab_stats, "count": 2, "delay": 2.0} ],
-		# Round 59 (Index 58): 50 Camo Lead, 20 Ceramic
-		[ {"stats_func": _get_camo_lead_stats, "count": 50, "delay": 0.1}, {"stats_func": _get_ceramic_stats, "count": 20, "delay": 0.4} ],
-		# Round 60 (Index 59): 1 BFB
-		[ {"stats_func": _get_bfb_stats, "count": 1, "delay": 0.0} ],
-		# Round 61 (Index 60): 150 Regrow Zebra, 3 MOAB
-		[ {"stats_func": _get_regrow_zebra_stats, "count": 150, "delay": 0.1}, {"stats_func": _get_moab_stats, "count": 3, "delay": 1.5} ],
-		# Round 62 (Index 61): 250 Purple, 15 Camo Purple, 5 MOAB
-		[ {"stats_func": _get_purple_stats, "count": 250, "delay": 0.05}, {"stats_func": _get_camo_purple_stats, "count": 15, "delay": 0.3}, {"stats_func": _get_moab_stats, "count": 5, "delay": 1.0} ],
-		# Round 63 (Index 62): 75 Lead, 122 Ceramic, 3 MOAB
-		[ {"stats_func": _get_lead_stats, "count": 75, "delay": 0.05}, {"stats_func": _get_ceramic_stats, "count": 122, "delay": 0.05}, {"stats_func": _get_moab_stats, "count": 3, "delay": 1.0} ],
-		# Round 64 (Index 63): 6 MOAB, 4 Fortified MOAB
-		[ {"stats_func": _get_moab_stats, "count": 6, "delay": 0.8}, {"stats_func": _get_fortified_moab_stats, "count": 4, "delay": 1.2} ],
-		# Round 65 (Index 64): 100 Zebra, 70 Rainbow, 50 Ceramic, 3 MOAB, 2 BFB
-		[ {"stats_func": _get_zebra_stats, "count": 100, "delay": 0.05}, {"stats_func": _get_rainbow_stats, "count": 70, "delay": 0.1}, {"stats_func": _get_ceramic_stats, "count": 50, "delay": 0.15}, {"stats_func": _get_moab_stats, "count": 3, "delay": 1.0}, {"stats_func": _get_bfb_stats, "count": 2, "delay": 2.0} ],
-		# Round 66 (Index 65): 8 MOAB
-		[ {"stats_func": _get_moab_stats, "count": 8, "delay": 0.6} ],
-		# Round 67 (Index 66): 13 Camo Regrow Rainbow
-		[ {"stats_func": _get_camo_regrow_rainbow_stats, "count": 13, "delay": 0.5} ],
-		# Round 68 (Index 67): 4 MOAB, 1 BFB
-		[ {"stats_func": _get_moab_stats, "count": 4, "delay": 0.8}, {"stats_func": _get_bfb_stats, "count": 1, "delay": 2.0} ],
-		# Round 69 (Index 68): 40 Regrow Black, 40 Lead, 50 Ceramic
-		[ {"stats_func": _get_regrow_black_stats, "count": 40, "delay": 0.1}, {"stats_func": _get_lead_stats, "count": 40, "delay": 0.1}, {"stats_func": _get_ceramic_stats, "count": 50, "delay": 0.2} ],
-		# Round 70 (Index 69): 12 Camo Rainbow, 200 Regrow White, 4 MOAB
-		[ {"stats_func": _get_camo_rainbow_stats, "count": 12, "delay": 0.4}, {"stats_func": _get_regrow_white_stats, "count": 200, "delay": 0.05}, {"stats_func": _get_moab_stats, "count": 4, "delay": 1.0} ],
-		# Round 71 (Index 70): 30 Ceramic, 10 MOAB
-		[ {"stats_func": _get_ceramic_stats, "count": 30, "delay": 0.3}, {"stats_func": _get_moab_stats, "count": 10, "delay": 0.7} ],
-		# Round 72 (Index 71): 38 Regrow Ceramic, 2 BFB
-		[ {"stats_func": _get_regrow_ceramic_stats, "count": 38, "delay": 0.2}, {"stats_func": _get_bfb_stats, "count": 2, "delay": 2.0} ],
-		# Round 73 (Index 72): 8 MOAB, 2 BFB
-		[ {"stats_func": _get_moab_stats, "count": 8, "delay": 0.6}, {"stats_func": _get_bfb_stats, "count": 2, "delay": 2.0} ],
-		# Round 74 (Index 73): 50 Camo Green, 100 Ceramic, 1 BFB
-		[ {"stats_func": _get_camo_green_stats, "count": 50, "delay": 0.1}, {"stats_func": _get_ceramic_stats, "count": 100, "delay": 0.1}, {"stats_func": _get_bfb_stats, "count": 1, "delay": 2.0} ],
-		# Round 75 (Index 74): 14 Lead, 14 Fortified Lead, 5 MOAB, 1 BFB, 3 Fortified MOAB
-		[ {"stats_func": _get_lead_stats, "count": 14, "delay": 0.4}, {"stats_func": _get_fortified_lead_stats, "count": 14, "delay": 0.4}, {"stats_func": _get_moab_stats, "count": 5, "delay": 0.8}, {"stats_func": _get_bfb_stats, "count": 1, "delay": 2.0}, {"stats_func": _get_fortified_moab_stats, "count": 3, "delay": 1.5} ],
-		# Round 76 (Index 75): 60 Regrow Ceramic
-		[ {"stats_func": _get_regrow_ceramic_stats, "count": 60, "delay": 0.1} ],
-		# Round 77 (Index 76): 11 MOAB, 5 BFB
-		[ {"stats_func": _get_moab_stats, "count": 11, "delay": 0.5}, {"stats_func": _get_bfb_stats, "count": 5, "delay": 1.5} ],
-		# Round 78 (Index 77): 75 Purple, 80 Ceramic, 1 BFB, 6 Camo Rainbow
-		[ {"stats_func": _get_purple_stats, "count": 75, "delay": 0.05}, {"stats_func": _get_ceramic_stats, "count": 80, "delay": 0.05}, {"stats_func": _get_bfb_stats, "count": 1, "delay": 1.0}, {"stats_func": _get_camo_rainbow_stats, "count": 6, "delay": 0.5} ],
-		# Round 79 (Index 78): 500 Regrow Rainbow, 40 Fortified Ceramic, 10 BFB, 2 Fortified MOAB
-		# Note: Rainbow count reduced
-		[ {"stats_func": _get_regrow_rainbow_stats, "count": 200, "delay": 0.02}, {"stats_func": _get_fortified_ceramic_stats, "count": 40, "delay": 0.2}, {"stats_func": _get_bfb_stats, "count": 10, "delay": 0.5}, {"stats_func": _get_fortified_moab_stats, "count": 2, "delay": 1.0} ],
-		# Round 80 (Index 79): 1 ZOMG
-		[ {"stats_func": _get_zomg_stats, "count": 1, "delay": 0.0} ],
-		# Round 81 (Index 80): 10 BFB
-		[ {"stats_func": _get_bfb_stats, "count": 10, "delay": 0.6} ],
-		# Round 82 (Index 81): 15 BFB, 5 Fortified MOAB
-		[ {"stats_func": _get_bfb_stats, "count": 15, "delay": 0.5}, {"stats_func": _get_fortified_moab_stats, "count": 5, "delay": 1.0} ],
-		# Round 83 (Index 82): 40 Ceramic, 40 Regrow Ceramic, 10 MOAB
-		[ {"stats_func": _get_ceramic_stats, "count": 40, "delay": 0.1}, {"stats_func": _get_regrow_ceramic_stats, "count": 40, "delay": 0.1}, {"stats_func": _get_moab_stats, "count": 10, "delay": 0.5} ],
-		# Round 84 (Index 83): 50 MOAB, 10 BFB
-		[ {"stats_func": _get_moab_stats, "count": 50, "delay": 0.2}, {"stats_func": _get_bfb_stats, "count": 10, "delay": 0.6} ],
-		# Round 85 (Index 84): 2 ZOMG
-		[ {"stats_func": _get_zomg_stats, "count": 2, "delay": 2.0} ],
-		# Round 86 (Index 85): 5 BFB
-		[ {"stats_func": _get_bfb_stats, "count": 5, "delay": 1.0} ],
-		# Round 87 (Index 86): 4 ZOMG
-		[ {"stats_func": _get_zomg_stats, "count": 4, "delay": 1.5} ],
-		# Round 88 (Index 87): 18 MOAB, 6 BFB, 2 ZOMG
-		[ {"stats_func": _get_moab_stats, "count": 18, "delay": 0.3}, {"stats_func": _get_bfb_stats, "count": 6, "delay": 0.8}, {"stats_func": _get_zomg_stats, "count": 2, "delay": 2.0} ],
-		# Round 89 (Index 88): 10 Fortified BFB
-		[ {"stats_func": _get_fortified_bfb_stats, "count": 10, "delay": 0.6} ],
-		# Round 90 (Index 89): 3 DDT
-		[ {"stats_func": _get_ddt_stats, "count": 3, "delay": 1.5} ],
-		# Round 91 (Index 90): 100 Fortified Ceramic, 10 BFB
-		[ {"stats_func": _get_fortified_ceramic_stats, "count": 100, "delay": 0.05}, {"stats_func": _get_bfb_stats, "count": 10, "delay": 0.5} ],
-		# Round 92 (Index 91): 8 ZOMG, 150 Purple
-		[ {"stats_func": _get_zomg_stats, "count": 8, "delay": 0.8}, {"stats_func": _get_purple_stats, "count": 150, "delay": 0.05} ],
-		# Round 93 (Index 92): 10 Fortified BFB, 6 DDT
-		[ {"stats_func": _get_fortified_bfb_stats, "count": 10, "delay": 0.5}, {"stats_func": _get_ddt_stats, "count": 6, "delay": 1.0} ],
-		# Round 94 (Index 93): 15 ZOMG
-		[ {"stats_func": _get_zomg_stats, "count": 15, "delay": 0.5} ],
-		# Round 95 (Index 94): 500 Camo Regrow Purple, 250 DDT, 30 DDT
-		# Note: Purple count reduced
-		[ {"stats_func": _get_camo_regrow_purple_stats, "count": 200, "delay": 0.02}, {"stats_func": _get_ddt_stats, "count": 30, "delay": 0.4} ],
-		# Round 96 (Index 95): 6 Fortified MOAB, 10 Fortified BFB, 6 ZOMG
-		[ {"stats_func": _get_fortified_moab_stats, "count": 6, "delay": 0.8}, {"stats_func": _get_fortified_bfb_stats, "count": 10, "delay": 0.6}, {"stats_func": _get_zomg_stats, "count": 6, "delay": 1.0} ],
-		# Round 97 (Index 96): 2 Fortified ZOMG
-		[ {"stats_func": _get_fortified_zomg_stats, "count": 2, "delay": 2.0} ],
-		# Round 98 (Index 97): 30 BFB, 8 ZOMG
-		[ {"stats_func": _get_bfb_stats, "count": 30, "delay": 0.2}, {"stats_func": _get_zomg_stats, "count": 8, "delay": 0.7} ],
-		# Round 99 (Index 98): 9 Fortified DDT, 3 Fortified ZOMG
-		[ {"stats_func": _get_fortified_ddt_stats, "count": 9, "delay": 0.5}, {"stats_func": _get_fortified_zomg_stats, "count": 3, "delay": 1.5} ],
-		# Round 100 (Index 99): 1 BAD
-		[ {"stats_func": _get_bad_stats, "count": 1, "delay": 0.0} ],
-		# Round 101 (Index 100): 50 Fortified Purple, 100 Fortified Lead, 20 Fortified Ceramic
-		[ {"stats_func": _get_fortified_purple_stats, "count": 50, "delay": 0.1}, {"stats_func": _get_fortified_lead_stats, "count": 100, "delay": 0.1}, {"stats_func": _get_fortified_ceramic_stats, "count": 20, "delay": 0.3} ],
-		# Round 102 (Index 101): 25 Fortified MOAB, 1 ZOMG
-		[ {"stats_func": _get_fortified_moab_stats, "count": 25, "delay": 0.3}, {"stats_func": _get_zomg_stats, "count": 1, "delay": 2.0} ],
-		# Round 103 (Index 102): 200 Fortified Ceramic, 6 ZOMG
-		[ {"stats_func": _get_fortified_ceramic_stats, "count": 200, "delay": 0.05}, {"stats_func": _get_zomg_stats, "count": 6, "delay": 0.8} ],
-		# Round 104 (Index 103): 500 Camo Regrow Pink, 30 Fortified MOAB, 100 Fortified Lead
-		# Note: Pink count reduced
-		[ {"stats_func": _get_camo_regrow_pink_stats, "count": 200, "delay": 0.02}, {"stats_func": _get_fortified_moab_stats, "count": 30, "delay": 0.3}, {"stats_func": _get_fortified_lead_stats, "count": 100, "delay": 0.1} ],
-		# Round 105 (Index 104): 200 Fortified Ceramic, 100 Purple, 10 Fortified BFB
-		[ {"stats_func": _get_fortified_ceramic_stats, "count": 200, "delay": 0.05}, {"stats_func": _get_purple_stats, "count": 100, "delay": 0.1}, {"stats_func": _get_fortified_bfb_stats, "count": 10, "delay": 0.5} ],
-		# Round 106 (Index 105): 15 DDT, 15 Fortified DDT
-		[ {"stats_func": _get_ddt_stats, "count": 15, "delay": 0.4}, {"stats_func": _get_fortified_ddt_stats, "count": 15, "delay": 0.4} ],
-		# Round 107 (Index 106): 25 BFB, 10 Fortified BFB
-		[ {"stats_func": _get_bfb_stats, "count": 25, "delay": 0.3}, {"stats_func": _get_fortified_bfb_stats, "count": 10, "delay": 0.5} ],
-		# Round 108 (Index 107): 12 ZOMG
-		[ {"stats_func": _get_zomg_stats, "count": 12, "delay": 0.6} ],
-		# Round 109 (Index 108): 60 Fortified Ceramic, 10 Fortified MOAB, 10 Fortified BFB
-		[ {"stats_func": _get_fortified_ceramic_stats, "count": 60, "delay": 0.1}, {"stats_func": _get_fortified_moab_stats, "count": 10, "delay": 0.5}, {"stats_func": _get_fortified_bfb_stats, "count": 10, "delay": 0.6} ],
-		# Round 110 (Index 109): 50 MOAB, 15 Fortified MOAB
-		[ {"stats_func": _get_moab_stats, "count": 50, "delay": 0.2}, {"stats_func": _get_fortified_moab_stats, "count": 15, "delay": 0.4} ],
-		# Round 111 (Index 110): 30 BFB
-		[ {"stats_func": _get_bfb_stats, "count": 30, "delay": 0.3} ],
-		# Round 112 (Index 111): 150 Fortified Ceramic, 20 Fortified MOAB
-		[ {"stats_func": _get_fortified_ceramic_stats, "count": 150, "delay": 0.05}, {"stats_func": _get_fortified_moab_stats, "count": 20, "delay": 0.4} ],
-		# Round 113 (Index 112): 15 ZOMG
-		[ {"stats_func": _get_zomg_stats, "count": 15, "delay": 0.5} ],
-		# Round 114 (Index 113): 10 MOAB, 10 BFB, 10 ZOMG
-		[ {"stats_func": _get_moab_stats, "count": 10, "delay": 0.5}, {"stats_func": _get_bfb_stats, "count": 10, "delay": 0.6}, {"stats_func": _get_zomg_stats, "count": 10, "delay": 0.7} ],
-		# Round 115 (Index 114): 20 DDT, 10 Fortified DDT, 5 BFB
-		[ {"stats_func": _get_ddt_stats, "count": 20, "delay": 0.3}, {"stats_func": _get_fortified_ddt_stats, "count": 10, "delay": 0.4}, {"stats_func": _get_bfb_stats, "count": 5, "delay": 0.8} ],
-		# Round 116 (Index 115): 8 Fortified ZOMG
-		[ {"stats_func": _get_fortified_zomg_stats, "count": 8, "delay": 0.8} ],
-		# Round 117 (Index 116): 18 Fortified BFB
-		[ {"stats_func": _get_fortified_bfb_stats, "count": 18, "delay": 0.4} ],
-		# Round 118 (Index 117): 20 MOAB, 20 Fortified MOAB
-		[ {"stats_func": _get_moab_stats, "count": 20, "delay": 0.3}, {"stats_func": _get_fortified_moab_stats, "count": 20, "delay": 0.3} ],
-		# Round 119 (Index 118): 10 BFB, 10 Fortified BFB, 2 Fortified ZOMG
-		[ {"stats_func": _get_bfb_stats, "count": 10, "delay": 0.5}, {"stats_func": _get_fortified_bfb_stats, "count": 10, "delay": 0.5}, {"stats_func": _get_fortified_zomg_stats, "count": 2, "delay": 2.0} ],
-		# Round 120 (Index 119): 2 BAD
-		[ {"stats_func": _get_bad_stats, "count": 2, "delay": 3.0} ],
-		# Round 121 (Index 120): 12 Fortified DDT, 6 Fortified ZOMG
-		[ {"stats_func": _get_fortified_ddt_stats, "count": 12, "delay": 0.4}, {"stats_func": _get_fortified_zomg_stats, "count": 6, "delay": 1.0} ],
-		# Round 122 (Index 121): 3 BAD
-		[ {"stats_func": _get_bad_stats, "count": 3, "delay": 2.5} ],
-		# --- Rounds 123-140 ---
-		# Round 123 (index 122): 8 Fortified ZOMGs, 200 MOABs
-		[ {"stats_func": _get_fortified_zomg_stats, "count": 8, "delay": 1.0}, {"stats_func": _get_moab_stats, "count": 200, "delay": 0.1} ],
-		# Round 124 (index 123): 75 Fortified BFBs
-		[ {"stats_func": _get_fortified_bfb_stats, "count": 75, "delay": 0.2} ],
-		# Round 125 (index 124): 21 ZOMGs, 42 BFBs, 63 MOABs
-		[ {"stats_func": _get_zomg_stats, "count": 21, "delay": 0.8}, {"stats_func": _get_bfb_stats, "count": 42, "delay": 0.4}, {"stats_func": _get_moab_stats, "count": 63, "delay": 0.2} ],
-		# Round 126 (index 125): 1 Fortified Camo Regrow Lead, 99 DDTs
-		[ {"stats_func": _get_fortified_camo_regrow_lead_stats, "count": 1, "delay": 5.0}, {"stats_func": _get_ddt_stats, "count": 99, "delay": 0.1} ],
-		# Round 127 (index 126): 48 MOABs, 24 BFBs
-		[ {"stats_func": _get_moab_stats, "count": 48, "delay": 0.3}, {"stats_func": _get_bfb_stats, "count": 24, "delay": 0.6} ],
-		# Round 128 (index 127): 39 Fortified DDTs, 200 Fortified Camo Ceramics, 30 BFBs
-		[ {"stats_func": _get_fortified_ddt_stats, "count": 39, "delay": 0.4}, {"stats_func": _get_fortified_camo_ceramic_stats, "count": 200, "delay": 0.05}, {"stats_func": _get_bfb_stats, "count": 30, "delay": 0.8} ],
-		# Round 129 (index 128): 7 Fortified ZOMGs, 77 Fortified Camo Leads, 77 Camo Purples, 77 Camo Ceramics, 7 ZOMGs, 18 DDTs
-		[
-			{"stats_func": _get_fortified_zomg_stats, "count": 7, "delay": 2.0},
-			{"stats_func": _get_fortified_camo_lead_stats, "count": 77, "delay": 0.2},
-			{"stats_func": _get_camo_purple_stats, "count": 77, "delay": 0.2},
-			{"stats_func": _get_camo_ceramic_stats, "count": 77, "delay": 0.2},
-			{"stats_func": _get_zomg_stats, "count": 7, "delay": 2.0},
-			{"stats_func": _get_ddt_stats, "count": 18, "delay": 0.8},
-		],
-		# Round 130 (index 129): 84 MOABs, 66 Fortified MOABs, 48 DDTs, 6 Fortified DDTs
-		[
-			{"stats_func": _get_moab_stats, "count": 84, "delay": 0.15},
-			{"stats_func": _get_fortified_moab_stats, "count": 66, "delay": 0.2},
-			{"stats_func": _get_ddt_stats, "count": 48, "delay": 0.3},
-			{"stats_func": _get_fortified_ddt_stats, "count": 6, "delay": 1.0},
-		],
-		# Round 131 (index 130): 18 Fortified ZOMGs
-		[ {"stats_func": _get_fortified_zomg_stats, "count": 18, "delay": 0.9} ],
-		# Round 132 (index 131): 18 ZOMGs, 6 Fortified ZOMGs, 200 Camo Purples
-		[ {"stats_func": _get_zomg_stats, "count": 18, "delay": 0.9}, {"stats_func": _get_fortified_zomg_stats, "count": 6, "delay": 1.5}, {"stats_func": _get_camo_purple_stats, "count": 200, "delay": 0.05} ],
-		# Round 133 (index 132): 12 Fortified MOABs, 12 Fortified BFBs, 4 Fortified ZOMGs, 27 MOABs, 27 BFBs, 9 ZOMGs
-		[
-			{"stats_func": _get_fortified_moab_stats, "count": 12, "delay": 0.5},
-			{"stats_func": _get_fortified_bfb_stats, "count": 12, "delay": 0.8},
-			{"stats_func": _get_fortified_zomg_stats, "count": 4, "delay": 1.5},
-			{"stats_func": _get_moab_stats, "count": 27, "delay": 0.3},
-			{"stats_func": _get_bfb_stats, "count": 27, "delay": 0.6},
-			{"stats_func": _get_zomg_stats, "count": 9, "delay": 1.0},
-		],
-		# Round 134 (index 133): 12 Fortified BFBs, 28 BFBs
-		[ {"stats_func": _get_fortified_bfb_stats, "count": 12, "delay": 0.8}, {"stats_func": _get_bfb_stats, "count": 28, "delay": 0.5} ],
-		# Round 135 (index 134): 14 Fortified ZOMGs, 21 Fortified DDTs
-		[ {"stats_func": _get_fortified_zomg_stats, "count": 14, "delay": 1.0}, {"stats_func": _get_fortified_ddt_stats, "count": 21, "delay": 0.5} ],
-		# Round 136 (index 135): 96 Fortified MOABs, 24 BFBs
-		[ {"stats_func": _get_fortified_moab_stats, "count": 96, "delay": 0.1}, {"stats_func": _get_bfb_stats, "count": 24, "delay": 0.6} ],
-		# Round 137 (index 136): 18 ZOMGs, 24 BFBs, 48 MOABs
-		[ {"stats_func": _get_zomg_stats, "count": 18, "delay": 0.8}, {"stats_func": _get_bfb_stats, "count": 24, "delay": 0.6}, {"stats_func": _get_moab_stats, "count": 48, "delay": 0.3} ],
-		# Round 138 (index 137): 81 Fortified DDTs, 45 DDTs
-		[ {"stats_func": _get_fortified_ddt_stats, "count": 81, "delay": 0.15}, {"stats_func": _get_ddt_stats, "count": 45, "delay": 0.25} ],
-		# Round 139 (index 138): 181 MOABs, 72 Fortified MOABs
-		[ {"stats_func": _get_moab_stats, "count": 181, "delay": 0.05}, {"stats_func": _get_fortified_moab_stats, "count": 72, "delay": 0.1} ],
-		# Round 140 (index 139): 1 Fortified BAD, 1 BAD
-		[ {"stats_func": _get_fortified_bad_stats, "count": 1, "delay": 10.0}, {"stats_func": _get_bad_stats, "count": 1, "delay": 5.0} ],
-	]
-	start_next_wave()
+	# -- load and expand shorthand wave data --
+	var f = FileAccess.open("res://data/waves.json", FileAccess.READ)
+	if f:
+		var txt = f.get_as_text()
+		f.close()
+		var j = JSON.parse(txt)
+		if j.error == OK:
+			raw_wave_data = j.result
+			for wave in raw_wave_data:
+				var conv : Array = []
+				for entry in wave:
+					var parts = entry.split(",")
+					var key = parts[0].strip_edges().to_lower()
+					var cnt = int(parts[1])
+					var dly = float(parts[2])
+					var fn = STATS_FUNC_MAP.get(key)
+					if fn:
+						conv.append({ "stats_func": fn, "count": cnt, "delay": dly })
+					else:
+						printerr("WaveManager: unknown wave key '", key, "' in data.")
+				current_wave_data.append(conv)
+		else:
+			printerr("WaveManager: JSON parse error ", j.error)
+	else:
+		printerr("WaveManager: cannot open data/waves.json")
+	# -- end load --
 
 
 func start_next_wave():
