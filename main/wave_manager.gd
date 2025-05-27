@@ -205,21 +205,19 @@ func spawn_bloon(bloon_stats_resource: BloonStats, p_progress_ratio: float = 0.0
 	if bloon_instance is PathFollow3D: # REMOVED: p_progress_ratio > 0.0 check
 		bloon_instance.progress_ratio = p_progress_ratio
 
-	# --- NEW: Connect child spawning signal ---
-	if not bloon_instance.spawn_children_requested.is_connected(_on_bloon_spawn_children):
-		bloon_instance.spawn_children_requested.connect(_on_bloon_spawn_children)
-	# --- NEW: Connect bloon removal signal ---
-	if not bloon_instance.bloon_removed_from_play.is_connected(_on_bloon_removed):
-		bloon_instance.bloon_removed_from_play.connect(_on_bloon_removed)
+	# --- Always (re)connect child‐spawn and removal signals with our WaveManager as target ---
+	bloon_instance.spawn_children_requested .connect( Callable(self, "_on_bloon_spawn_children") )
+	bloon_instance.bloon_removed_from_play    .connect( Callable(self, "_on_bloon_removed") )
 
 	# The bloon's pool_reset() should handle setting progress to 0.
 	# No further setup needed here unless you have wave-specific modifications.
 
 # --- NEW: Handle Bloon Removal ---
-func _on_bloon_removed():
+func _on_bloon_removed(...):
+	# DEBUG log each removal
+	print("DEBUG: Bloon removed, active before = ", active_bloons_in_current_round)
 	if active_bloons_in_current_round > 0:
 		active_bloons_in_current_round -= 1
-		# print_debug("Bloon removed, active count: ", active_bloons_in_current_round)
 		_check_round_clear() # Check if the field is now clear
 	# else: print_debug("Bloon removed, but active count was already 0?") # Should not happen ideally
 
