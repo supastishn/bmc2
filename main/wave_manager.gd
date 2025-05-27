@@ -10,8 +10,8 @@ var path_node: Path3D # This will be set by main.gd
 @onready var spawn_timer: Timer = $SpawnTimer
 #@onready var wave_timer: Timer = $WaveTimer # Removed - waves advance immediately after spawning finishes
 
-# Short‐hand loader
-var raw_wave_data: Array = []
+## Short‐hand loader (now a dict keyed by string round numbers)
+var raw_wave_data: Dictionary = {}
 var current_wave_data: Array = []
 
 const STATS_FUNC_MAP = {
