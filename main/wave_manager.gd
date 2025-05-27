@@ -1,8 +1,8 @@
 # File: res://main/wave_manager.gd
 extends Node
 
-# Preload the base bloon scene used for all types
-@export var base_bloon_scene: PackedScene = preload("res://bloon/bloon.tscn")
+#export var base_bloon_scene: PackedScene = preload("res://bloon/bloon.tscn")
+@export var inter_wave_delay: float = 3.0  # seconds to wait before next wave
 const BLOON_STATS_SCRIPT = preload("res://stats/bloon_stats.gd")
 
 var path_node: Path3D # This will be set by main.gd
