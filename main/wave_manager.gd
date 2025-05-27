@@ -228,7 +228,7 @@ func _on_bloon_removed():
 func _check_round_clear():
 	# Field is clear if spawning is complete AND no active bloons remain
 	if spawning_complete_for_current_round and active_bloons_in_current_round == 0:
-		print("All bloons cleared for wave ", current_wave_index + 1)
+		print("DEBUG: Round ended – all bloons cleared for wave ", current_wave_index + 1)
 		emit_signal("wave_cleared", current_wave_index + 1)
 
 # --- NEW: Child Spawning Handler ---

@@ -33,6 +33,7 @@ func _on_game_manager_round_changed(new_round):
 
 func _on_wave_ready(round_number):
 	# show button when either spawning or clearing finished
+	print("DEBUG: HUD received wave_ready(", round_number, ") → showing NextWaveButton")
 	next_wave_button.show()
 
 func _on_next_wave_pressed():
