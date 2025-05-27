@@ -125,12 +125,13 @@ func _on_spawn_timer_timeout():
 		spawn_timer.wait_time = bloon_info["delay"] # Use delay from the bloon just spawned
 		spawn_timer.start()
 	else:
-		# This was the last bloon for this wave.
-		# Mark spawning as complete, increment index, and trigger the next wave start immediately.
-		print("Wave ", current_wave_index + 1, " spawning finished (last bloon).")
+		# Last bloon spawned → schedule next wave after a delay
+		print("Wave ", current_wave_index + 1, " spawning finished (last bloon). Waiting ", inter_wave_delay, "s before next wave.")
 		spawning_complete_for_current_round = true
 		current_wave_index += 1
-		start_next_wave()
+		spawn_timer.wait_time = inter_wave_delay
+		spawn_timer.one_shot = true
+		spawn_timer.start()
 
 
 	# This else block might be redundant now due to the check at the start

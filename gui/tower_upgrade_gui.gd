@@ -43,12 +43,8 @@ func display_tower(tower: Node):
 		var current_tier = tower.get_upgrade_level(path_index)
 		var next_tier = current_tier + 1
 
-		# Disconnect previous connection before potentially reconnecting
-		# Check if the signal exists and is connected before trying to disconnect
-		if button.pressed.get_connections():
-			for connection in button.pressed.get_connections():
-				if connection.callable.get_object() == self and connection.callable.get_method() == "_on_upgrade_button_pressed":
-					button.pressed.disconnect(connection.callable)
+		# Always clear any prior upgrade_requested binding in one call
+		button
 
 
 		if tower.is_path_locked(path_index) or next_tier > 5:

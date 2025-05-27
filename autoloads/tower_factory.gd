@@ -185,8 +185,9 @@ func create_stats(tower_name: String, upgrade_path_str: String) -> Dictionary:
 		return {}
 
 	# --- Duplicate the base stats to avoid modifying originals ---
-	var current_tower_stats: TowerStats = base_data.tower.duplicate(true) # Deep copy might be safer
-	var current_projectile_stats: ProjectileStats = base_data.projectile.duplicate(true)
+	# use shallow duplicate so we don’t accidentally share/choke on sub-resources
+	var current_tower_stats: TowerStats = base_data.tower.duplicate()
+	var current_projectile_stats: ProjectileStats = base_data.projectile.duplicate()
 
 	# Parse upgrade path levels
 	var p1 = int(upgrade_path_str[0])
@@ -200,31 +201,17 @@ func create_stats(tower_name: String, upgrade_path_str: String) -> Dictionary:
 		var max_level = path_levels[path_idx]
 		_apply_path_upgrades(tower_name, path_idx + 1, max_level, current_tower_stats, current_projectile_stats)
 
-	# --- Apply Attack Speed Multipliers (Specific Logic after base stats are modified) ---
-	# NOTE: Path 1 T3+ and Path 3 T4+ set their own absolute cooldowns in their funcs.
-	# Path 2 speed boosts should only apply if not overridden by Path 1/3 later tiers.
-	var cooldown_multiplier = 1.0
-	var is_speed_overridden = (p1 >= 3) or (p3 >= 4) # Check if path 1/3 overrides speed
-
-	if tower_name == "dart-monkey" and not is_speed_overridden:
-		# Base cooldown is 0.95s
-		match p2: # Apply path 2 speed boosts cumulatively
-			1: cooldown_multiplier *= 0.85 # 0.95 * 0.85 = 0.8075s
-			2: 
-				cooldown_multiplier *= 0.85 * (0.8075 / 0.95 * 0.7882) # ~0.67 total multi -> 0.6365s
-			# Simplification: Use target values directly if known
-			# cooldown_multiplier = 0.67 # Target multiplier for T2
-				current_tower_stats.attack_cooldown = 0.6365 # Set directly based on 020 stats
-			3: # Triple shot: 75%s relative to T2 -> 0.6365 * 0.75 = 0.4774s
+	# --- Path-2 pure overrides for Dart Monkey attack_cooldown (point 2) ---
+	if tower_name == "dart-monkey":
+		match p2:
+			1:
+				current_tower_stats.attack_cooldown = 0.95 * 0.85
+			2:
+				current_tower_stats.attack_cooldown = 0.6365
+			3:
 				current_tower_stats.attack_cooldown = 0.4774
-			4: # Fan Club: 50%s relative to T3 -> 0.4774 * 0.5 = 0.2387s
+			4, 5:
 				current_tower_stats.attack_cooldown = 0.2387
-			5: # PMFC: Same speed as T4
-				current_tower_stats.attack_cooldown = 0.2387
-
-		# Apply multiplier only if T2 wasn't reached (direct values used above for T2+)
-		if p2 < 2:
-			current_tower_stats.attack_cooldown *= cooldown_multiplier
 
 	# Crosspath Benefits application (Example: Path 3 T2 knockback boost for Jugg T4/5)
 	if tower_name == "dart-monkey" and p1 >= 4 and p3 >= 2: # Juggernaut T4/5 with Enhanced Eyesight T2+
