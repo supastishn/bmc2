@@ -153,6 +153,8 @@ func _on_spawn_timer_timeout():
 			spawning_complete_for_current_round = true
 			print("Wave ", current_wave_index + 1, " spawning finished.")
 			emit_signal("wave_spawning_complete", current_wave_index + 1)
+
+			_check_round_clear()   # ← NEW – covers case where all bloons were already popped
 		return
 
 	# Spawn the next bloon in the list
@@ -224,10 +226,13 @@ func _on_bloon_removed():
 # --- NEW: Check if the Round Should End ---
 # --- RENAMED: Check if the Round *field* is clear ---
 func _check_round_clear():
-	# Field is clear if spawning is complete AND no active bloons remain
+	# Field is clear if spawning is done AND there are no active bloons
 	if spawning_complete_for_current_round and active_bloons_in_current_round == 0:
 		print("DEBUG: Round ended – all bloons cleared for wave ", current_wave_index + 1)
 		emit_signal("wave_cleared", current_wave_index + 1)
+
+		# Advance to the next wave so the next “Start Wave” press loads it
+		current_wave_index += 1
 
 # --- NEW: Child Spawning Handler ---
 func _on_bloon_spawn_children(children_stats_array: Array, spawn_progress_ratio: float, popping_projectile: Object): # Added popping_projectile param
