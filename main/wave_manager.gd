@@ -540,5 +540,21 @@ func _get_camo_regrow_zebra_stats() -> BloonStats: var stats = _get_zebra_stats(
 func _get_camo_regrow_rainbow_stats() -> BloonStats: var stats = _get_rainbow_stats(); stats.is_camo = true; stats.is_regrow = true; return stats
 func _get_camo_regrow_purple_stats() -> BloonStats: var stats = _get_purple_stats(); stats.is_camo = true; stats.is_regrow = true; return stats
 
+# --- FORTIFIED + CAMO helpers for MOAB-class bloons ---
+func _get_fortified_camo_moab_stats() -> BloonStats:
+    var s = _get_fortified_moab_stats()
+    s.is_camo = true
+    return s
+
+func _get_fortified_camo_bfb_stats() -> BloonStats:
+    var s = _get_fortified_bfb_stats()
+    s.is_camo = true
+    return s
+
+func _get_fortified_camo_zomg_stats() -> BloonStats:
+    var s = _get_fortified_zomg_stats()
+    s.is_camo = true
+    return s
+
 #endregion Modifiers
 #endregion
