@@ -1,8 +1,8 @@
 extends Control
 
-@onready var lives_label: Label =  %LivesLabel # Adjust path as needed
-@onready var cash_label: Label = %CashLabel   # Adjust path as needed
-@onready var round_label: Label = %RoundLabel # NEW Round label
+@onready var lives_label: Label = $LivesLabel
+@onready var cash_label: Label = $CashLabel
+@onready var round_label: Label = $RoundLabel
 @onready var next_wave_button: Button = $NextWaveButton
 
 func _ready():
