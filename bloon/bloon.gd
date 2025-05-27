@@ -157,12 +157,12 @@ func handle_pop(source_projectile_that_popped_me: Object): # ADDED parameter
 		var children_to_spawn: Array = []
 		if stats.bloon_type == "Zebra":
 			# Special case: 1 Black + 1 White
-			children_to_spawn = [WaveManager._get_black_stats(), WaveManager._get_white_stats()]
+			children_to_spawn = [BloonFactory.get_black_stats(), BloonFactory.get_white_stats()]
 		elif stats.bloon_type == "BAD":
 			# Special case: 2 ZOMG + 3 DDT
 			children_to_spawn = [
-				WaveManager._get_zomg_stats(), WaveManager._get_zomg_stats(),
-				WaveManager._get_ddt_stats(), WaveManager._get_ddt_stats(), WaveManager._get_ddt_stats()
+				BloonFactory.get_zomg_stats(), BloonFactory.get_zomg_stats(),
+				BloonFactory.get_ddt_stats(), BloonFactory.get_ddt_stats(), BloonFactory.get_ddt_stats()
 			]
 		elif stats.child_bloon_stats and stats.child_bloon_count > 0:
 			# Standard case: N children of the same type
