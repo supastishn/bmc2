@@ -52,7 +52,8 @@ func _ready():
 		if j.error == OK:
 			raw_wave_data = j.result        # now a Dictionary keyed by "1"… "140"
 			# build current_wave_data in numeric order
-			var round_nums = raw_wave_data.keys().map(func(k): return int(k)).sort()
+			var round_nums = raw_wave_data.keys().map(func(k): return int(k))
+			round_nums.sort()
 			for num in round_nums:
 				var entries = raw_wave_data[str(num)]
 				var conv: Array = []
