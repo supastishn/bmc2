@@ -422,15 +422,8 @@ func _on_sell_requested():
 		printerr("Sell requested but no tower selected or tower invalid.")
 		return
 
-	# 1. Calculate Sell Value
-	var sell_value = 0
-	# Use the stored total_spent value from the tower script
-	if currently_selected_tower.has_meta("total_spent"): # Check if meta exists (or use property directly)
-		sell_value = int(currently_selected_tower.total_spent * 0.7)
-	elif currently_selected_tower.has_method("get") and currently_selected_tower.has_method("total_spent"): # Alternative check
-		sell_value = int(currently_selected_tower.total_spent * 0.7)
-	else:
-		printerr("Could not get total_spent from tower to calculate sell value.")
+	# 1. Calculate Sell Value (total_spent is a plain property on the tower)
+	var sell_value = int(currently_selected_tower.total_spent * 0.7)
 
 
 	# 2. Increase Player Cash
