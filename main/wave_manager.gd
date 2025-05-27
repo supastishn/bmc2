@@ -75,9 +75,13 @@ var spawning_complete_for_current_round: bool = false
 const BASE_RED_SPEED = 2.0 # Define base speed for multipliers
 
 func _ready():
-	# Ensure timers exist and connect signals
-	if not spawn_timer: spawn_timer = Timer.new(); spawn_timer.name = "SpawnTimer"; add_child(spawn_timer)
-	spawn_timer.one_shot = true # Spawn one bloon per timeout
+	# Ensure spawn_timer is in the tree before we ever start it
+	if not spawn_timer.is_inside_tree():
+		spawn_timer = Timer.new()
+		spawn_timer.name = "SpawnTimer"
+		spawn_timer.one_shot = true
+		add_child(spawn_timer)
+
 	if not spawn_timer.timeout.is_connected(_on_spawn_timer_timeout): spawn_timer.timeout.connect(_on_spawn_timer_timeout)
 
 	# -- load and expand shorthand wave data --
