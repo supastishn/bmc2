@@ -7,7 +7,7 @@ const BLOON_STATS_SCRIPT = preload("res://stats/bloon_stats.gd")
 
 var path_node: Path3D # This will be set by main.gd
 
-@onready var spawn_timer: Timer = $SpawnTimer
+@onready var spawn_timer: Timer = Timer.new()
 #@onready var wave_timer: Timer = $WaveTimer # Removed - waves advance immediately after spawning finishes
 
 ## Short‐hand loader (now a dict keyed by string round numbers)
@@ -463,19 +463,19 @@ func _get_camo_rainbow_stats() -> BloonStats: var stats = _get_rainbow_stats(); 
 
 # --- MOAB-class pure camo helpers ---
 func _get_camo_moab_stats() -> BloonStats:
-    var s = _get_moab_stats()
-    s.is_camo = true
-    return s
+	var s = _get_moab_stats()
+	s.is_camo = true
+	return s
 
 func _get_camo_bfb_stats() -> BloonStats:
-    var s = _get_bfb_stats()
-    s.is_camo = true
-    return s
+	var s = _get_bfb_stats()
+	s.is_camo = true
+	return s
 
 func _get_camo_zomg_stats() -> BloonStats:
-    var s = _get_zomg_stats()
-    s.is_camo = true
-    return s
+	var s = _get_zomg_stats()
+	s.is_camo = true
+	return s
 
 # --- Regrow Stat Functions ---
 func _get_regrow_lead_stats() -> BloonStats:
@@ -542,19 +542,19 @@ func _get_camo_regrow_purple_stats() -> BloonStats: var stats = _get_purple_stat
 
 # --- FORTIFIED + CAMO helpers for MOAB-class bloons ---
 func _get_fortified_camo_moab_stats() -> BloonStats:
-    var s = _get_fortified_moab_stats()
-    s.is_camo = true
-    return s
+	var s = _get_fortified_moab_stats()
+	s.is_camo = true
+	return s
 
 func _get_fortified_camo_bfb_stats() -> BloonStats:
-    var s = _get_fortified_bfb_stats()
-    s.is_camo = true
-    return s
+	var s = _get_fortified_bfb_stats()
+	s.is_camo = true
+	return s
 
 func _get_fortified_camo_zomg_stats() -> BloonStats:
-    var s = _get_fortified_zomg_stats()
-    s.is_camo = true
-    return s
+	var s = _get_fortified_zomg_stats()
+	s.is_camo = true
+	return s
 
 #endregion Modifiers
 #endregion
