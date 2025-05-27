@@ -29,8 +29,8 @@ func prepare_pool(scene: PackedScene, initial_size: int):
 
 		# Connect the node's signal to our return function (Bloon still uses this)
 		if node_instance.has_signal("returned_to_pool"):
-			# Use call_deferred to avoid issues if signal is emitted during physics step
-			node_instance.returned_to_pool.connect(_on_node_returned.bind(scene).call_deferred)
+			# Bind the scene and connect (we no longer invoke call_deferred here)
+			node_instance.returned_to_pool.connect(_on_node_returned.bind(scene))
 		else:
 			# Projectiles won't have this signal anymore, Bloons should
 			if not scene.resource_path.contains("projectile"): # Avoid error for projectiles
@@ -53,7 +53,7 @@ func request_node(scene: PackedScene) -> Node:
 		var new_node = scene.instantiate()
 		# Connect signal for fallback instances too (relevant for Bloons)
 		if new_node.has_signal("returned_to_pool"):
-			new_node.returned_to_pool.connect(_on_node_returned.bind(scene).call_deferred)
+			new_node.returned_to_pool.connect(_on_node_returned.bind(scene))
 		# Set meta for fallback nodes so they *can* be returned if a pool is created later
 		new_node.set_meta("source_scene", scene)
 		return new_node
