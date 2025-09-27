@@ -1,0 +1,31 @@
+{
+  "base": {
+    "tower": { "attack_cooldown": 0.95, "range": 3.2, "can_see_camo": false },
+    "projectile": { "speed": 35.0, "damage": 1, "lifetime": 0.7, "pierce": 2, "damage_type": "Sharp" },
+    "cost": 200
+  },
+  "path1": {
+    "1": { "name": "Sharp Shots", "cost": 140, "desc": "+1 Pierce", "mods": { "projectile": { "pierce": "+1" } } },
+    "2": { "name": "Razor Sharp", "cost": 220, "desc": "+2 Pierce", "mods": { "projectile": { "pierce": "+2" } } },
+    "3": { "name": "Spike-o-pult", "cost": 300, "desc": "Spike ball", "mods": { "tower": { "attack_cooldown": 1.15, "range": "*1.15" }, "projectile": { "damage": 2, "pierce": 18, "damage_type": "Shatter", "speed": 17.5, "can_rebound": true } },
+          "capabilities": { "bouncy": { "through_walls": true } } },
+    "4": { "name": "Juggernaut", "cost": 1500, "desc": "Huge ceramic dmg", "mods": { "tower": { "attack_cooldown": 1.0 }, "projectile": { "pierce": 60, "extra_fortified_damage": 2, "extra_ceramic_damage": 3, "damage_type": "Normal", "applies_knockback": true } },
+          "capabilities": { "knockback": { "slow_other": -5.0, "slow_ceramic_lead": -1.0 } } },
+    "5": { "name": "Ultra-Juggernaut", "cost": 8000, "desc": "Emits mini jugs", "mods": { "projectile": { "damage": 5, "pierce": 210, "extra_fortified_damage": 5, "extra_ceramic_damage": 8, "extra_lead_damage": 20 } },
+          "capabilities": { "emit_on_expire": { "count": 6, "projectile": "mini_jugg" } } }
+  },
+  "path2": {
+    "1": { "name": "Quick Shots", "cost": 100, "desc": "15% faster", "mods": { "tower": { "attack_cooldown": "*0.85" } } },
+    "2": { "name": "Very Quick Shots", "cost": 180, "desc": "33% faster", "mods": { "tower": { "attack_cooldown": 0.6365 } } },
+    "3": { "name": "Triple Shot", "cost": 400, "desc": "3 darts", "mods": { "tower": { "projectiles_per_shot": 3, "spread_angle": 30.0 } } },
+    "4": { "name": "Super Monkey Fan Club", "cost": 8000, "desc": "Ability: Fan Club (stub)", "ability_id": "dart_fan_club", "mods": {} },
+    "5": { "name": "Plasma Monkey Fan Club", "cost": 45000, "desc": "Ability: PMFC (stub)", "ability_id": "dart_plasma_monkey_fan_club", "mods": {} }
+  },
+  "path3": {
+    "1": { "name": "Long Range Darts", "cost": 90, "desc": "+range", "mods": { "tower": { "range": 4.5 }, "projectile": { "lifetime": "*1.2" } } },
+    "2": { "name": "Enhanced Eyesight", "cost": 170, "desc": "+range camo", "mods": { "tower": { "range": 5.4, "can_see_camo": true }, "projectile": { "speed": "*1.2", "lifetime": "*1.2" } } },
+    "3": { "name": "Crossbow", "cost": 550, "desc": "bolt", "mods": { "tower": { "range": 6.7 }, "projectile": { "damage": 3, "pierce": 3, "speed": "*1.3", "damage_type": "Sharp" } } },
+    "4": { "name": "Sharp Shooter", "cost": 1600, "desc": "crits", "mods": { "tower": { "attack_cooldown": 0.475 }, "projectile": { "crit_frequency": 10, "crit_extra_damage": 50 } } },
+    "5": { "name": "Crossbow Master", "cost": 21500, "desc": "fast", "mods": { "tower": { "range": 9.0, "attack_cooldown": 0.2375 }, "projectile": { "damage": 8, "pierce": 8, "crit_frequency": 5, "crit_extra_damage": 80, "damage_type": "Normal" } } }
+  }
+}

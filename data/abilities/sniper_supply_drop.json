@@ -1,0 +1,11 @@
+{
+  "id": "sniper_supply_drop",
+  "display_name": "Supply Drop",
+  "type": "active",
+  "cooldown": 60.0,
+  "duration": 0.0,
+  "initial_cooldown": 15.0,
+  "description": "Calls in a crate of cash to this Sniper.",
+  "effects": { "income": { "cash": 1200 } }
+}
+

@@ -1,0 +1,17 @@
+{
+  "id": "tack_blade_maelstrom",
+  "display_name": "Blade Maelstrom",
+  "type": "active",
+  "cooldown": 30.0,
+  "duration": 3.0,
+  "initial_cooldown": 10.0,
+  "description": "Spins a devastating storm of blades around the tower.",
+  "effects": {
+    "maelstrom": {
+      "rpm": 900,
+      "radius": 3.0,
+      "damage": 1
+    }
+  }
+}
+

@@ -1,0 +1,11 @@
+{
+  "id": "dart_plasma_monkey_fan_club",
+  "display_name": "Plasma Monkey Fan Club",
+  "type": "active",
+  "cooldown": 50.0,
+  "duration": 15.0,
+  "initial_cooldown": 16.67,
+  "description": "Transforms up to 20 Dart Monkeys into Plasma Monkeys.",
+  "effects": { "notes": "Stub only." }
+}
+

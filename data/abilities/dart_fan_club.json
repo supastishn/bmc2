@@ -1,0 +1,13 @@
+{
+  "id": "dart_fan_club",
+  "display_name": "Super Monkey Fan Club",
+  "type": "active",
+  "cooldown": 50.0,
+  "duration": 15.0,
+  "initial_cooldown": 16.67,
+  "description": "Temporarily transforms up to 10 nearby Dart Monkeys into Super Monkeys.",
+  "effects": {
+    "notes": "Stub only. No runtime binding."
+  }
+}
+

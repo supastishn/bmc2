@@ -1,0 +1,31 @@
+{
+  "base": {
+    "tower": { "attack_cooldown": 1.0, "range": 3.2, "can_see_camo": false },
+    "projectile": { "speed": 25.0, "damage": 1, "lifetime": 0.8, "pierce": 4, "damage_type": "Sharp" },
+    "cost": 325
+  },
+  "path1": {
+    "1": { "name": "Improved Rangs", "cost": 100, "desc": "+4 pierce", "mods": { "projectile": { "pierce": "+4" } } },
+    "2": { "name": "Glaives", "cost": 250, "desc": "+5 pierce", "mods": { "projectile": { "pierce": "+5" } } },
+    "3": { "name": "Glaive Ricochet", "cost": 900, "desc": "Ricochet, pass through walls", "mods": { "projectile": { "pierce": 30, "can_rebound": true, "speed": "*1.1" } },
+          "capabilities": { "ricochet": { "jump_distance": 60, "through_walls": true } } },
+    "4": { "name": "MOAB Press", "cost": 2600, "desc": "+pierce, faster, knockback MOABs (stub)", "mods": { "tower": { "attack_cooldown": "*0.67" }, "projectile": { "pierce": 60, "applies_knockback": true, "damage_type": "Sharp", "speed": "*1.15" } } },
+    "5": { "name": "Glaive Lord", "cost": 32000, "desc": "Faster, stronger ricochet (stub auras)", "mods": { "tower": { "attack_cooldown": "*0.5" }, "projectile": { "damage": "+1", "pierce": 90, "speed": "*1.1" } } }
+  },
+  "path2": {
+    "1": { "name": "Faster Throwing", "cost": 150, "desc": "75% attack cooldown", "mods": { "tower": { "attack_cooldown": "*0.75" } } },
+    "2": { "name": "Faster Rangs", "cost": 300, "desc": "66.6% attack cooldown", "mods": { "tower": { "attack_cooldown": "*0.666" }, "projectile": { "speed": "*1.1" } } },
+    "3": { "name": "Bionic Boomerang", "cost": 900, "desc": "Very fast throws", "mods": { "tower": { "attack_cooldown": 0.238 } } },
+    "4": { "name": "Turbo Charge", "cost": 3500, "desc": "Ability: short self-buff (stub)", "ability_id": "boomerang_turbo_charge", "mods": { } },
+    "5": { "name": "Perma Charge", "cost": 32000, "desc": "Sustained speed/strength (stub)", "mods": { "tower": { "attack_cooldown": "*0.9" }, "projectile": { "damage": "+1" } } }
+  },
+  "path3": {
+    "1": { "name": "Long Range Rangs", "cost": 100, "desc": "+range", "mods": { "tower": { "range": "*1.33" }, "projectile": { "lifetime": "*1.15" } } },
+    "2": { "name": "Red Hot Rangs", "cost": 200, "desc": "+1 damage, pop lead", "mods": { "projectile": { "damage": "+1", "damage_type": "Normal" } } },
+    "3": { "name": "Kylie Boomerang", "cost": 1300, "desc": "Straight path boomerang", "mods": { "projectile": { "damage": 2, "pierce": 18, "speed": "*1.1" } },
+          "capabilities": { "linear_throw": true, "rehit_cooldown": 0.3 } },
+    "4": { "name": "MOAR Glaives", "cost": 4200, "desc": "+pierce, faster", "mods": { "tower": { "attack_cooldown": "*0.9" }, "projectile": { "pierce": "+8" } } },
+    "5": { "name": "MOAB Domination", "cost": 55000, "desc": "High knockback (stub)", "mods": { "projectile": { "applies_knockback": true, "damage": "+1", "pierce": "+12" } },
+          "capabilities": { "moab_domination": true } }
+  }
+}

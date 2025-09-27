@@ -1,0 +1,11 @@
+{
+  "id": "sniper_elite_supply_drop",
+  "display_name": "Elite Supply Drop",
+  "type": "active",
+  "cooldown": 45.0,
+  "duration": 0.0,
+  "initial_cooldown": 15.0,
+  "description": "Calls in a larger crate of cash to this Sniper.",
+  "effects": { "income": { "cash": 2400 } }
+}
+

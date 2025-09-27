@@ -9,14 +9,59 @@ extends Node
 # For now, we'll mostly use the base projectile scene and modify its stats/mesh.
 const BASE_TOWER_SCENE: PackedScene = preload("res://tower/tower.tscn")
 const BASE_PROJECTILE_SCENE: PackedScene = preload("res://projectile/projectile.tscn")
-# --- Define Meshes (Replace with your actual .tres files) ---
-const DART_MONKEY_MESH = preload("res://meshes/dart_monkey_mesh.tres") # Example
-const DART_PROJECTILE_MESH = preload("res://meshes/dart_projectile_mesh.tres") # Example
-const SHARP_SHOTS_PROJECTILE_MESH = preload("res://meshes/sharp_dart_mesh.tres") # Example
-const SPIKEBALL_MESH = preload("res://meshes/spikeball_mesh.tres") # NEW
-const JUGGERNAUT_MESH = preload("res://meshes/juggernaut_mesh.tres") # NEW
-const MINI_JUGGERNAUT_MESH = preload("res://meshes/mini_juggernaut_mesh.tres") # NEW
-const BOLT_MESH = preload("res://meshes/bolt_mesh.tres") # NEW
+const TowerLoader = preload("res://autoloads/tower_loader.gd")
+# --- Tower Meshes ---
+const DART_MONKEY_MESH = preload("res://meshes/dart_monkey_mesh.tres")
+const BOOMERANG_MONKEY_MESH = preload("res://meshes/boomerang_monkey_mesh.tres")
+const BOMB_SHOOTER_MESH = preload("res://meshes/bomb_shooter_mesh.tres")
+const TACK_SHOOTER_MESH = preload("res://meshes/tack_shooter_mesh.tres")
+const ICE_MONKEY_MESH = preload("res://meshes/ice_monkey_mesh.tres")
+const GLUE_GUNNER_MESH = preload("res://meshes/glue_gunner_mesh.tres")
+const SNIPER_MONKEY_MESH = preload("res://meshes/sniper_monkey_mesh.tres")
+const MONKEY_SUB_MESH = preload("res://meshes/monkey_sub_mesh.tres")
+const MONKEY_BUCCANEER_MESH = preload("res://meshes/monkey_buccaneer_mesh.tres")
+const MONKEY_ACE_MESH = preload("res://meshes/monkey_ace_mesh.tres")
+const HELI_PILOT_MESH = preload("res://meshes/heli_pilot_mesh.tres")
+const MORTAR_MONKEY_MESH = preload("res://meshes/mortar_monkey_mesh.tres")
+const DARTLING_GUNNER_MESH = preload("res://meshes/dartling_gunner_mesh.tres")
+const WIZARD_MONKEY_MESH = preload("res://meshes/wizard_monkey_mesh.tres")
+const SUPER_MONKEY_MESH = preload("res://meshes/super_monkey_mesh.tres")
+const NINJA_MONKEY_MESH = preload("res://meshes/ninja_monkey_mesh.tres")
+const ALCHEMIST_MESH = preload("res://meshes/alchemist_mesh.tres")
+const DRUID_MESH = preload("res://meshes/druid_mesh.tres")
+const BANANA_FARM_MESH = preload("res://meshes/banana_farm_mesh.tres")
+const SPIKE_FACTORY_MESH = preload("res://meshes/spike_factory_mesh.tres")
+const MONKEY_VILLAGE_MESH = preload("res://meshes/monkey_village_mesh.tres")
+const ENGINEER_MONKEY_MESH = preload("res://meshes/engineer_monkey_mesh.tres")
+
+# --- Projectile Meshes ---
+const DART_PROJECTILE_MESH = preload("res://meshes/dart_projectile_mesh.tres")
+const BOOMERANG_PROJECTILE_MESH = preload("res://meshes/boomerang_projectile_mesh.tres")
+const BOMB_PROJECTILE_MESH = preload("res://meshes/bomb_projectile_mesh.tres")
+const TACK_PROJECTILE_MESH = preload("res://meshes/tack_projectile_mesh.tres")
+const ICE_PROJECTILE_MESH = preload("res://meshes/ice_projectile_mesh.tres")
+const GLUE_PROJECTILE_MESH = preload("res://meshes/glue_projectile_mesh.tres")
+const SNIPER_PROJECTILE_MESH = preload("res://meshes/sniper_projectile_mesh.tres")
+const HARPOON_PROJECTILE_MESH = preload("res://meshes/harpoon_projectile_mesh.tres")
+const CANNONBALL_PROJECTILE_MESH = preload("res://meshes/cannonball_projectile_mesh.tres")
+const ACE_PROJECTILE_MESH = preload("res://meshes/ace_projectile_mesh.tres")
+const HELI_PROJECTILE_MESH = preload("res://meshes/heli_projectile_mesh.tres")
+const MORTAR_PROJECTILE_MESH = preload("res://meshes/mortar_projectile_mesh.tres")
+const DART_LASER_MESH = preload("res://meshes/dart_laser_mesh.tres")
+const MAGIC_BOLT_MESH = preload("res://meshes/magic_bolt_mesh.tres")
+const LASER_PROJECTILE_MESH = preload("res://meshes/laser_projectile_mesh.tres")
+const SHURIKEN_PROJECTILE_MESH = preload("res://meshes/shuriken_projectile_mesh.tres")
+const POTION_PROJECTILE_MESH = preload("res://meshes/potion_projectile_mesh.tres")
+const THORN_PROJECTILE_MESH = preload("res://meshes/thorn_projectile_mesh.tres")
+const SPIKE_PROJECTILE_MESH = preload("res://meshes/spike_projectile_mesh.tres")
+const NAIL_PROJECTILE_MESH = preload("res://meshes/nail_projectile_mesh.tres")
+
+# --- Upgrade Meshes ---
+const SHARP_SHOTS_PROJECTILE_MESH = preload("res://meshes/sharp_dart_mesh.tres")
+const SPIKEBALL_MESH = preload("res://meshes/spikeball_mesh.tres")
+const JUGGERNAUT_MESH = preload("res://meshes/juggernaut_mesh.tres")
+const MINI_JUGGERNAUT_MESH = preload("res://meshes/mini_juggernaut_mesh.tres")
+const BOLT_MESH = preload("res://meshes/bolt_mesh.tres")
 
 # --- Tower Data Definition ---
 # Structure:
@@ -38,10 +83,9 @@ func _update_can_pop_lead(ps: ProjectileStats):
 var tower_data := {
 	"dart-monkey": {
 		"base": {
-			# 000: 32r, 0.95s, dart: 1d, 2p, sharp, speed 35, lifetime 0.7
-			"tower": TowerStats.new(0.95, 3.5, false, BASE_PROJECTILE_SCENE, DART_MONKEY_MESH),
+			"tower": TowerStats.new(0.95, 3.2, false, BASE_PROJECTILE_SCENE, DART_MONKEY_MESH),
 			"projectile": ProjectileStats.new(35.0, 1, 0.7, 2, false, 5.0, DART_PROJECTILE_MESH, "Sharp"),
-			"cost": 200 # Base cost of Dart Monkey
+			"cost": 200
 		},
 		"path1": {
 			# 100: +1p
@@ -164,7 +208,63 @@ var tower_data := {
 		}
 	},
 	},
-	# --- Add data for other towers ---
+	# --- Phase 1: Additional towers (base only, abilities/auras stubbed) ---
+	"boomerang-monkey": {
+		"base": {
+			"tower": TowerStats.new(1.0, 3.2, false, BASE_PROJECTILE_SCENE, null),
+			"projectile": ProjectileStats.new(25.0, 1, 0.8, 4, false, 5.0, null, "Sharp"),
+			"cost": 325
+		},
+		"path1": {}, "path2": {}, "path3": {}
+	},
+	"bomb-shooter": {
+		"base": {
+			"tower": TowerStats.new(1.4, 3.6, false, BASE_PROJECTILE_SCENE, null),
+			"projectile": ProjectileStats.new(22.0, 1, 0.9, 30, false, 5.0, null, "Explosive"),
+			"cost": 650
+		},
+		"path1": {}, "path2": {}, "path3": {}
+	},
+	"tack-shooter": {
+		"base": {
+			"tower": TowerStats.new(1.1, 2.5, false, BASE_PROJECTILE_SCENE, null),
+			"projectile": ProjectileStats.new(30.0, 1, 0.5, 1, false, 5.0, null, "Sharp"),
+			"cost": 300
+		},
+		"path1": {}, "path2": {}, "path3": {}
+	},
+	"sniper-monkey": {
+		"base": {
+			"tower": TowerStats.new(1.5, 100.0, true, BASE_PROJECTILE_SCENE, null),
+			"projectile": ProjectileStats.new(120.0, 2, 1.0, 1, false, 5.0, null, "Sharp"),
+			"cost": 300
+		},
+		"path1": {}, "path2": {}, "path3": {}
+	},
+	"ninja-monkey": {
+		"base": {
+			"tower": TowerStats.new(0.95, 3.5, true, BASE_PROJECTILE_SCENE, null),
+			"projectile": ProjectileStats.new(32.0, 1, 0.7, 2, false, 5.0, null, "Sharp"),
+			"cost": 425
+		},
+		"path1": {}, "path2": {}, "path3": {}
+	},
+	"wizard-monkey": {
+		"base": {
+			"tower": TowerStats.new(1.0, 3.6, false, BASE_PROJECTILE_SCENE, null),
+			"projectile": ProjectileStats.new(40.0, 1, 0.8, 2, false, 5.0, null, "Energy"),
+			"cost": 450
+		},
+		"path1": {}, "path2": {}, "path3": {}
+	},
+	"super-monkey": {
+		"base": {
+			"tower": TowerStats.new(0.055, 4.5, false, BASE_PROJECTILE_SCENE, null),
+			"projectile": ProjectileStats.new(60.0, 1, 0.5, 1, false, 5.0, null, "Sharp"),
+			"cost": 2500
+		},
+		"path1": {}, "path2": {}, "path3": {}
+	}
 }
 
 # --- Factory Functions ---
@@ -179,33 +279,54 @@ func create_stats(tower_name: String, upgrade_path_str: String) -> Dictionary:
 		printerr("TowerFactory: Invalid upgrade path string '", upgrade_path_str, "'. Must be 3 digits.")
 		return {}
 
-	var base_data = tower_data[tower_name].get("base")
-	if not base_data or not base_data.has("tower") or not base_data.has("projectile"):
-		printerr("TowerFactory: Base data missing for '", tower_name, "'")
-		return {}
+\tvar base_data = tower_data[tower_name].get("base")
+\tif not base_data or not base_data.has("tower") or not base_data.has("projectile"):
+\t\tprinterr("TowerFactory: Base data missing for '", tower_name, "'")
+\t\treturn {}
 
 	# --- Duplicate the base stats to avoid modifying originals ---
 	# use shallow duplicate so we don’t accidentally share/choke on sub-resources
 	var current_tower_stats: TowerStats = base_data.tower.duplicate()
 	var current_projectile_stats: ProjectileStats = base_data.projectile.duplicate()
 
-	# Parse upgrade path levels
-	var p1 = int(upgrade_path_str[0])
+	# Ensure scenes are assigned
+	current_tower_stats.projectile_scene = BASE_PROJECTILE_SCENE if current_tower_stats.projectile_scene == null else current_tower_stats.projectile_scene
+	# For projectiles, mesh can be null; projectile.gd handles default
+
+\t# Optionally load JSON definition for this tower (data-driven)
+\tvar json_def: Dictionary = TowerLoader.load_tower_json(tower_name)
+
+\t# Parse upgrade path levels
+\tvar p1 = int(upgrade_path_str[0])
 
 	var p2 = int(upgrade_path_str[1])
 	var p3 = int(upgrade_path_str[2])
 	var path_levels = [p1, p2, p3]
 
-	# Apply upgrades sequentially for each path based on levels
-	for path_idx in range(3):
-		var max_level = path_levels[path_idx]
-		_apply_path_upgrades(tower_name, path_idx + 1, max_level, current_tower_stats, current_projectile_stats)
+\t# If JSON exists, apply base overrides then JSON path mods; else use built-ins
+\tif not json_def.is_empty():
+\t\tif json_def.has("base"):
+\t\t\tTowerLoader.apply_mods(current_tower_stats, current_projectile_stats, json_def.base)
+\t\tfor path_idx in range(3):
+\t\t\tvar max_level = path_levels[path_idx]
+\t\t\tvar pkey = "path" + str(path_idx + 1)
+\t\t\tif json_def.has(pkey):
+\t\t\t\tvar path_def: Dictionary = json_def[pkey]
+\t\t\t\tfor level in range(1, max_level + 1):
+\t\t\t\t\tvar key = str(level)
+\t\t\t\t\tif path_def.has(key) and path_def[key].has("mods"):
+\t\t\t\t\t\tTowerLoader.apply_mods(current_tower_stats, current_projectile_stats, path_def[key].mods)
+\telse:
+\t\t# Apply upgrades sequentially for each path based on levels using built-ins
+\t\tfor path_idx in range(3):
+\t\t\tvar max_level = path_levels[path_idx]
+\t\t\t_apply_path_upgrades(tower_name, path_idx + 1, max_level, current_tower_stats, current_projectile_stats)
 
 	# --- Path-2 pure overrides for Dart Monkey attack_cooldown (point 2) ---
-	if tower_name == "dart-monkey":
-		match p2:
-			1:
-				current_tower_stats.attack_cooldown = 0.95 * 0.85
+\tif tower_name == "dart-monkey" and json_def.is_empty():
+\t\tmatch p2:
+\t\t\t1:
+\t\t\t\tcurrent_tower_stats.attack_cooldown = 0.95 * 0.85
 			2:
 				current_tower_stats.attack_cooldown = 0.6365
 			3:
@@ -250,24 +371,39 @@ func _apply_path_upgrades(tower_name: String, path_index: int, max_level: int, t
 
 ## --- NEW: Get details for a specific upgrade tier ---
 func get_upgrade_details(tower_name: String, path_index: int, tier: int) -> Dictionary:
-	if not tower_data.has(tower_name): return {}
+    # Prefer JSON-defined metadata if available
+    var json_def: Dictionary = TowerLoader.load_tower_json(tower_name)
+    if not json_def.is_empty():
+        var path_key = "path" + str(path_index)
+        if json_def.has(path_key):
+            var pdef: Dictionary = json_def[path_key]
+            var key = str(tier)
+            if pdef.has(key):
+                var meta := {}
+                if pdef[key].has("name"): meta["name"] = pdef[key].name
+                if pdef[key].has("cost"): meta["cost"] = pdef[key].cost
+                if pdef[key].has("desc"): meta["desc"] = pdef[key].desc
+                return meta
+        return {}
 
-	var path_key = "path" + str(path_index)
-	if not tower_data[tower_name].has(path_key): return {}
-
-	var path_upgrades = tower_data[tower_name][path_key]
-	if path_upgrades.has(tier):
-		var details = path_upgrades[tier].duplicate() # Return a copy
-		details.erase("func") # Don't return the callable function itself
-		return details
-	else:
-		return {} # Tier not defined
+    # Fallback to built-in data
+    if not tower_data.has(tower_name): return {}
+    var path_key2 = "path" + str(path_index)
+    if not tower_data[tower_name].has(path_key2): return {}
+    var path_upgrades = tower_data[tower_name][path_key2]
+    if path_upgrades.has(tier):
+        var details = path_upgrades[tier].duplicate()
+        details.erase("func")
+        return details
+    return {}
 
 
 ## --- NEW: Get base cost of a tower ---
 func get_base_cost(tower_name: String) -> int:
+	var json_def: Dictionary = TowerLoader.load_tower_json(tower_name)
+	if not json_def.is_empty() and json_def.has("base") and json_def.base.has("cost"):
+		return int(json_def.base.cost)
 	if tower_data.has(tower_name) and tower_data[tower_name].has("base") and tower_data[tower_name].base.has("cost"):
 		return tower_data[tower_name].base.cost
-	else:
-		printerr("TowerFactory: Base cost not found for '", tower_name, "'")
-		return 999999 # Return high value on error
+	printerr("TowerFactory: Base cost not found for '", tower_name, "'")
+	return 999999 # Return high value on error

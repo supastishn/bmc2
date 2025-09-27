@@ -1,0 +1,32 @@
+{
+  "base": {
+    "tower": { "attack_cooldown": 0.62, "range": 4.0, "can_see_camo": true, "projectiles_per_shot": 1, "spread_angle": 10 },
+    "projectile": { "speed": 32.0, "damage": 1, "lifetime": 0.7, "pierce": 2, "damage_type": "Sharp" },
+    "cost": 425
+  },
+  "path1": {
+    "1": { "name": "Ninja Discipline", "cost": 200, "desc": "70% cooldown", "mods": { "tower": { "attack_cooldown": "*0.70" } } },
+    "2": { "name": "Sharp Shurikens", "cost": 300, "desc": "+2 pierce", "mods": { "projectile": { "pierce": "+2" } } },
+    "3": { "name": "Double Shot", "cost": 600, "desc": "+1 projectile", "mods": { "tower": { "projectiles_per_shot": "+1" } } },
+    "4": { "name": "Bloonjitsu", "cost": 2400, "desc": "5 shurikens", "mods": { "tower": { "projectiles_per_shot": 5, "spread_angle": 25 } } },
+    "5": { "name": "Grandmaster Ninja", "cost": 25000, "desc": "Rapid shurikens", "mods": { "tower": { "attack_cooldown": "*0.7" } } }
+  },
+  "path2": {
+    "1": { "name": "Seeking Shuriken", "cost": 200, "desc": "Seeking", "mods": { },
+          "capabilities": { "seeking": true } },
+    "2": { "name": "Caltrops", "cost": 350, "desc": "Track caltrops (stub)", "mods": { },
+          "capabilities": { "caltrops": { "interval": 3.9, "damage": 1, "pierce": 6 } } },
+    "3": { "name": "Distraction", "cost": 350, "desc": "Knockback (stub)", "mods": { "projectile": { "applies_knockback": true } },
+          "capabilities": { "distraction": { "chance": 0.15, "distance_min": 10, "distance_max": 250 } } },
+    "4": { "name": "Counter-Espionage", "cost": 550, "desc": "Remove camo on hit", "mods": { },
+          "capabilities": { "remove_camo_on_hit": true } },
+    "5": { "name": "Grand Saboteur", "cost": 25000, "desc": "Ability: slow MOABs (stub)", "ability_id": "ninja_grand_saboteur", "mods": { } }
+  },
+  "path3": {
+    "1": { "name": "Distance Throw", "cost": 180, "desc": "+range", "mods": { "tower": { "range": "*1.175" } } },
+    "2": { "name": "Seeking Mastery", "cost": 300, "desc": "+range +seek", "mods": { "tower": { "range": "*1.05" } } },
+    "3": { "name": "Flash Bomb", "cost": 700, "desc": "Stun bomb (stub)", "mods": { "projectile": { "damage_type": "Normal" } } },
+    "4": { "name": "Sticky Bomb", "cost": 2500, "desc": "Stick MOAB (stub)", "mods": { } },
+    "5": { "name": "Master Bomber", "cost": 35000, "desc": "Powerful bombs (stub)", "mods": { "projectile": { "damage": "+1" } } }
+  }
+}

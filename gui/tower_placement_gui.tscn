@@ -46,8 +46,57 @@ alignment = 1
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
-tooltip_text = "Basic Tower ($100)"
-text = "Tower 1"
+tooltip_text = "Dart Monkey ($200)"
+text = "Dart"
+
+[node name="BoomerangButton" type="Button" parent="PanelContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+tooltip_text = "Boomerang Monkey ($325)"
+text = "Boomerang"
+
+[node name="BombButton" type="Button" parent="PanelContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+tooltip_text = "Bomb Shooter ($650)"
+text = "Bomb"
+
+[node name="TackButton" type="Button" parent="PanelContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+tooltip_text = "Tack Shooter ($300)"
+text = "Tack"
+
+[node name="SniperButton" type="Button" parent="PanelContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+tooltip_text = "Sniper Monkey ($300)"
+text = "Sniper"
+
+[node name="NinjaButton" type="Button" parent="PanelContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+tooltip_text = "Ninja Monkey ($425)"
+text = "Ninja"
+
+[node name="WizardButton" type="Button" parent="PanelContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+tooltip_text = "Wizard Monkey ($450)"
+text = "Wizard"
+
+[node name="SuperButton" type="Button" parent="PanelContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+tooltip_text = "Super Monkey ($2500)"
+text = "Super"
 
 [node name="StatusLabel" type="Label" parent="."]
 unique_name_in_owner = true

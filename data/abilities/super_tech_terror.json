@@ -1,0 +1,11 @@
+{
+  "id": "super_tech_terror",
+  "display_name": "Tech Terror",
+  "type": "active",
+  "cooldown": 45.0,
+  "duration": 0.0,
+  "initial_cooldown": 15.0,
+  "description": "Fires an annihilation pulse that damages all bloons on screen.",
+  "effects": { "notes": "Stub only." }
+}
+

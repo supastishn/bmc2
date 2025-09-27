@@ -1,0 +1,28 @@
+{
+  "base": {
+    "tower": { "attack_cooldown": 0.045, "range": 5.0, "can_see_camo": false, "projectiles_per_shot": 1, "spread_angle": 0 },
+    "projectile": { "speed": 60.0, "damage": 1, "lifetime": 0.5, "pierce": 1, "damage_type": "Sharp" },
+    "cost": 2500
+  },
+  "path1": {
+    "1": { "name": "Laser Blasts", "cost": 1500, "desc": "Energy damage", "mods": { "projectile": { "damage_type": "Energy", "pierce": "+1" } } },
+    "2": { "name": "Plasma Blasts", "cost": 2500, "desc": "Plasma type", "mods": { } },
+    "3": { "name": "Sun Avatar", "cost": 15000, "desc": "Sun bolts", "mods": { "projectile": { "pierce": "+4" }, "tower": { "attack_cooldown": "*0.75" } } },
+    "4": { "name": "Sun Temple", "cost": 50000, "desc": "Temple (stub aura/sacrifice)", "mods": { "projectile": { "damage": "+1" } } },
+    "5": { "name": "True Sun God", "cost": 100000, "desc": "Late-game (stub)", "mods": { "tower": { "attack_cooldown": "*0.9" }, "projectile": { "damage": "+2", "pierce": "+3" } } }
+  },
+  "path2": {
+    "1": { "name": "Super Range", "cost": 600, "desc": "+range", "mods": { "tower": { "range": "+2.0" } } },
+    "2": { "name": "Ultravision", "cost": 600, "desc": "+range camo", "mods": { "tower": { "range": "+1.0", "can_see_camo": true } } },
+    "3": { "name": "Robo Monkey", "cost": 3500, "desc": "Double shot (stub)", "mods": { "tower": { "projectiles_per_shot": 2, "spread_angle": 6 } } },
+    "4": { "name": "Tech Terror", "cost": 12000, "desc": "Ability (stub)", "ability_id": "super_tech_terror", "mods": { } },
+    "5": { "name": "The Anti-Bloon", "cost": 60000, "desc": "High damage", "mods": { "projectile": { "damage": "+2" } } }
+  },
+  "path3": {
+    "1": { "name": "Knockback", "cost": 700, "desc": "Adds knockback", "mods": { "projectile": { "applies_knockback": true } } },
+    "2": { "name": "Ultraknockback", "cost": 900, "desc": "More knockback", "mods": { } },
+    "3": { "name": "Dark Knight", "cost": 2500, "desc": "Better damage", "mods": { "projectile": { "damage": "+1" } } },
+    "4": { "name": "Dark Champion", "cost": 35000, "desc": "Stronger", "mods": { "tower": { "attack_cooldown": "*0.9" } } },
+    "5": { "name": "Legend of the Night", "cost": 100000, "desc": "Black hole (stub)", "mods": { } }
+  }
+}

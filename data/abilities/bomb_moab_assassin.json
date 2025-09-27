@@ -1,0 +1,16 @@
+{
+  "id": "bomb_moab_assassin",
+  "display_name": "MOAB Assassin",
+  "type": "active",
+  "cooldown": 45.0,
+  "duration": 0.0,
+  "initial_cooldown": 15.0,
+  "description": "Fires a powerful missile at the strongest MOAB-class bloon.",
+  "effects": {
+    "assassin_strike": {
+      "target": "strongest_moab",
+      "bonus_damage": 700
+    }
+  }
+}
+

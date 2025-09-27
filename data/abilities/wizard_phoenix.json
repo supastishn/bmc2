@@ -1,0 +1,11 @@
+{
+  "id": "wizard_phoenix",
+  "display_name": "Summon Phoenix",
+  "type": "active",
+  "cooldown": 45.0,
+  "duration": 20.0,
+  "initial_cooldown": 15.0,
+  "description": "Summons a flaming phoenix to attack for a short duration.",
+  "effects": { "notes": "Stub only." }
+}
+

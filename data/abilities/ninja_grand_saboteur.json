@@ -1,0 +1,11 @@
+{
+  "id": "ninja_grand_saboteur",
+  "display_name": "Grand Saboteur",
+  "type": "active",
+  "cooldown": 60.0,
+  "duration": 15.0,
+  "initial_cooldown": 15.0,
+  "description": "Applies a slowdown to all MOAB-class bloons on screen.",
+  "effects": { "notes": "Stub only." }
+}
+

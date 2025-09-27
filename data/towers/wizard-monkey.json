@@ -1,0 +1,33 @@
+{
+  "base": {
+    "tower": { "attack_cooldown": 1.0, "range": 5.0, "can_see_camo": false },
+    "projectile": { "speed": 40.0, "damage": 1, "lifetime": 0.8, "pierce": 2, "damage_type": "Energy" },
+    "cost": 450
+  },
+  "path1": {
+    "1": { "name": "Fireball", "cost": 250, "desc": "Fire alt-attack (stub)", "mods": { },
+          "capabilities": { "fireball": { "damage": 1, "pierce": 6, "splash_radius": 1.5 } } },
+    "2": { "name": "Wall of Fire", "cost": 700, "desc": "Ground flame (stub)", "mods": { },
+          "capabilities": { "wall_of_fire": { "duration": 4.0, "radius": 2.0, "tick_rate": 0.2, "damage": 1 } } },
+    "3": { "name": "Dragon's Breath", "cost": 3000, "desc": "Flame stream", "mods": { "tower": { "attack_cooldown": "*0.8" }, "projectile": { "damage": "+1" } } },
+    "4": { "name": "Summon Phoenix", "cost": 4500, "desc": "Ability: Phoenix (stub)", "ability_id": "wizard_phoenix", "mods": { } },
+    "5": { "name": "Wizard Lord Phoenix", "cost": 30000, "desc": "Stronger phoenix (stub)", "mods": { } }
+  },
+  "path2": {
+    "1": { "name": "Guided Magic", "cost": 150, "desc": "Seeks", "mods": { } },
+    "2": { "name": "Arcane Blast", "cost": 300, "desc": "+damage", "mods": { "projectile": { "damage": "+1" } } },
+    "3": { "name": "Arcane Mastery", "cost": 2000, "desc": "+pierce +range", "mods": { "tower": { "range": "*1.1" }, "projectile": { "pierce": "+2" } } },
+    "4": { "name": "Arcane Spike", "cost": 8500, "desc": "+MOAB dmg (stub)", "mods": { "projectile": { "extra_fortified_damage": "+2" } } },
+    "5": { "name": "Archmage", "cost": 32000, "desc": "High damage", "mods": { "tower": { "attack_cooldown": "*0.85" }, "projectile": { "damage": "+2" } } }
+  },
+  "path3": {
+    "1": { "name": "Intense Magic", "cost": 200, "desc": "+pierce", "mods": { "projectile": { "pierce": "+1" } } },
+    "2": { "name": "Monkey Sense", "cost": 300, "desc": "Camo detect", "mods": { "tower": { "can_see_camo": true } } },
+    "3": { "name": "Shimmer", "cost": 500, "desc": "Reveal camo (stub aura)", "mods": { },
+          "capabilities": { "reveal_camo_aura": { "radius": 5.0, "tick_rate": 0.25 } } },
+    "4": { "name": "Necromancer", "cost": 3000, "desc": "Graveyard (stub)", "mods": { },
+          "capabilities": { "graveyard": { "max_minions": 25, "minion_damage": 1, "minion_pierce": 2 } } },
+    "5": { "name": "Prince of Darkness", "cost": 28000, "desc": "Stronger necro (stub)", "mods": { },
+          "capabilities": { "graveyard": { "max_minions": 60, "minion_damage": 2, "minion_pierce": 4 } } }
+  }
+}

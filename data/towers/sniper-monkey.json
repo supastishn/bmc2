@@ -1,0 +1,30 @@
+{
+  "base": {
+    "tower": { "attack_cooldown": 1.59, "range": 100.0, "can_see_camo": false },
+    "projectile": { "speed": 120.0, "damage": 2, "lifetime": 1.0, "pierce": 1, "damage_type": "Sharp" },
+    "cost": 300
+  },
+  "path1": {
+    "1": { "name": "Full Metal Jacket", "cost": 350, "desc": "+2 damage normal", "mods": { "projectile": { "damage": "+2", "damage_type": "Normal" } } },
+    "2": { "name": "Large Caliber", "cost": 500, "desc": "+3 damage", "mods": { "projectile": { "damage": "+3" } } },
+    "3": { "name": "Deadly Precision", "cost": 1200, "desc": "+damage", "mods": { "projectile": { "damage": "+2" } } },
+    "4": { "name": "Maim MOAB", "cost": 3000, "desc": "Stun MOABs (stub)", "mods": { "projectile": { "applies_knockback": true } } },
+    "5": { "name": "Cripple MOAB", "cost": 32000, "desc": "Stronger stuns (stub)", "mods": { "projectile": { "applies_knockback": true, "extra_fortified_damage": "+4" } } }
+  },
+  "path2": {
+    "1": { "name": "Night Vision Goggles", "cost": 200, "desc": "Camo detect", "mods": { "tower": { "can_see_camo": true } } },
+    "2": { "name": "Shrapnel Shot", "cost": 350, "desc": "Emits shrapnel (stub)", "mods": { },
+          "capabilities": { "shrapnel": { "count": 6, "damage": 1, "pierce": 2, "spread_deg": 45, "camo": true } } },
+    "3": { "name": "Bounce Bullets", "cost": 1100, "desc": "Ricochet (stub)", "mods": { "projectile": { "can_rebound": true } },
+          "capabilities": { "ricochet": { "max_bounces": 2 } } },
+    "4": { "name": "Supply Drop", "cost": 3500, "desc": "Ability: income (stub)", "ability_id": "sniper_supply_drop", "mods": { } },
+    "5": { "name": "Elite Supply Drop", "cost": 13500, "desc": "More income (stub)", "ability_id": "sniper_elite_supply_drop", "mods": { } }
+  },
+  "path3": {
+    "1": { "name": "Fast Firing", "cost": 250, "desc": "70% cooldown", "mods": { "tower": { "attack_cooldown": "*0.70" } } },
+    "2": { "name": "Even Faster Firing", "cost": 450, "desc": "Again 70%", "mods": { "tower": { "attack_cooldown": "*0.70" } } },
+    "3": { "name": "Semi-Automatic", "cost": 1200, "desc": "Rapid fire", "mods": { "tower": { "attack_cooldown": "*0.70" } } },
+    "4": { "name": "Full Auto Rifle", "cost": 5000, "desc": "Very rapid", "mods": { "tower": { "attack_cooldown": "*0.70" } } },
+    "5": { "name": "Elite Defender", "cost": 14000, "desc": "Extreme speed (stub passive)", "mods": { "tower": { "attack_cooldown": "*0.85" } } }
+  }
+}

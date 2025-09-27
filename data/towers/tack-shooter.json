@@ -1,0 +1,32 @@
+{
+  "base": {
+    "tower": { "attack_cooldown": 1.1, "range": 2.5, "can_see_camo": false, "projectiles_per_shot": 8, "spread_angle": 360 },
+    "projectile": { "speed": 30.0, "damage": 1, "lifetime": 0.5, "pierce": 1, "damage_type": "Sharp" },
+    "cost": 300
+  },
+  "path1": {
+    "1": { "name": "Faster Shooting", "cost": 150, "desc": "75% cooldown", "mods": { "tower": { "attack_cooldown": "*0.75" } } },
+    "2": { "name": "Even Faster", "cost": 300, "desc": "Again faster", "mods": { "tower": { "attack_cooldown": "*0.84" } } },
+    "3": { "name": "Hot Shots", "cost": 400, "desc": "+3 pierce (per paste path2T2)", "mods": { "projectile": { "pierce": "+3" } } },
+    "4": { "name": "Ring of Fire", "cost": 2500, "desc": "AoE fire (stub)", "mods": { "projectile": { "damage_type": "Normal", "pierce": "+2" } },
+          "capabilities": { "ring_aura": { "radius": 2.5, "tick_rate": 0.2, "damage": 1 } } },
+    "5": { "name": "Inferno Ring", "cost": 28000, "desc": "Stronger fire (stub)", "mods": { "projectile": { "damage": "+2", "pierce": "+5" } },
+          "capabilities": { "ring_aura": { "radius": 3.0, "tick_rate": 0.15, "damage": 2 } } }
+  },
+  "path2": {
+    "1": { "name": "Long Range", "cost": 120, "desc": "+range +lifespan", "mods": { "tower": { "range": "*1.17" }, "projectile": { "lifetime": "*1.25", "speed": "*1.1" } } },
+    "2": { "name": "Even Longer", "cost": 200, "desc": "+range +lifespan", "mods": { "tower": { "range": "*1.15" }, "projectile": { "lifetime": "*1.1" } } },
+    "3": { "name": "Blade Shooter", "cost": 850, "desc": "+3 pierce", "mods": { "projectile": { "pierce": "+3" } } },
+    "4": { "name": "Blade Maelstrom", "cost": 2500, "desc": "Ability: maelstrom (stub)", "ability_id": "tack_blade_maelstrom", "mods": { },
+          "capabilities": { "maelstrom": { "duration": 3.0, "rpm": 900 } } },
+    "5": { "name": "Super Maelstrom", "cost": 18000, "desc": "Longer ability (stub)", "ability_id": "tack_super_maelstrom", "mods": { },
+          "capabilities": { "maelstrom": { "duration": 6.0, "rpm": 1200 } } }
+  },
+  "path3": {
+    "1": { "name": "More Tacks", "cost": 100, "desc": "+2 projectiles", "mods": { "tower": { "projectiles_per_shot": "+2" } } },
+    "2": { "name": "Even More", "cost": 220, "desc": "+2 projectiles", "mods": { "tower": { "projectiles_per_shot": "+2" } } },
+    "3": { "name": "Tack Sprayer", "cost": 750, "desc": "Faster +spread", "mods": { "tower": { "attack_cooldown": "*0.9", "spread_angle": 360 } } },
+    "4": { "name": "Overdrive", "cost": 4500, "desc": "Much faster", "mods": { "tower": { "attack_cooldown": "*0.5" } } },
+    "5": { "name": "The Tack Zone", "cost": 25000, "desc": "Big damage", "mods": { "projectile": { "damage": "+1", "pierce": "+2" } } }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "base": {
+    "tower": { "attack_cooldown": 1.4, "range": 3.6, "can_see_camo": false },
+    "projectile": { "speed": 22.0, "damage": 1, "lifetime": 0.9, "pierce": 30, "damage_type": "Explosive" },
+    "cost": 650
+  },
+  "path1": {
+    "1": { "name": "Bigger Bombs", "cost": 200, "desc": "+pierce, bigger blasts", "mods": { "projectile": { "pierce": "+6" } } },
+    "2": { "name": "Heavy Bombs", "cost": 400, "desc": "+damage, +pierce", "mods": { "projectile": { "damage": "+1", "pierce": "+10" } } },
+    "3": { "name": "Missile Launcher", "cost": 1200, "desc": "+damage, +pierce", "mods": { "projectile": { "damage": "+1", "pierce": "+6" } } },
+    "4": { "name": "MOAB Mauler", "cost": 2200, "desc": "Strong vs MOABs (stub knockback)", "mods": { "projectile": { "extra_fortified_damage": "+2", "applies_knockback": true } },
+          "capabilities": { "moab_bonus": { "extra_damage": 10 } } },
+    "5": { "name": "MOAB Assassin", "cost": 5000, "desc": "Ability: MOAB missile (stub)", "ability_id": "bomb_moab_assassin", "mods": { } }
+  },
+  "path2": {
+    "1": { "name": "Faster Reload", "cost": 200, "desc": "75% attack cooldown", "mods": { "tower": { "attack_cooldown": "*0.75" } } },
+    "2": { "name": "Even Faster Reload", "cost": 400, "desc": "73.3% from previous", "mods": { "tower": { "attack_cooldown": "*0.733" } } },
+    "3": { "name": "Frag Bombs", "cost": 450, "desc": "Emits frags", "mods": { },
+          "capabilities": { "frags": { "count": 8, "damage": 1, "pierce": 1, "spread_deg": 180 } } },
+    "4": { "name": "MOAB Shredder", "cost": 2900, "desc": "More MOAB damage", "mods": { "projectile": { "extra_fortified_damage": "+2" } } },
+    "5": { "name": "Bloon Impact", "cost": 6500, "desc": "Stun on hit (stub)", "mods": { "projectile": { "applies_knockback": true } },
+          "capabilities": { "stun": { "duration": 1.0 } } }
+  },
+  "path3": {
+    "1": { "name": "Increased Range", "cost": 150, "desc": "+range", "mods": { "tower": { "range": "*1.3" } } },
+    "2": { "name": "Cluster Bombs", "cost": 700, "desc": "Cluster child bombs", "mods": { "tower": { "range": "*1.04" } },
+          "capabilities": { "cluster": { "child_count": 8, "child_damage": 1, "child_pierce": 1 } } },
+    "3": { "name": "Recursive Cluster", "cost": 2200, "desc": "Cluster spawns clusters", "mods": { },
+          "capabilities": { "cluster": { "child_count": 8, "depth": 2 } } },
+    "4": { "name": "Bomb Blitz", "cost": 12000, "desc": "End-game power", "mods": { "projectile": { "damage": "+1", "pierce": "+10" } } },
+    "5": { "name": "Bomb Blitz+", "cost": 35000, "desc": "Stronger explosions", "mods": { "projectile": { "damage": "+1", "pierce": "+20" } } }
+  }
+}

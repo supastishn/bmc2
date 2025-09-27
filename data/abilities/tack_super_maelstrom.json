@@ -1,0 +1,17 @@
+{
+  "id": "tack_super_maelstrom",
+  "display_name": "Super Maelstrom",
+  "type": "active",
+  "cooldown": 25.0,
+  "duration": 6.0,
+  "initial_cooldown": 10.0,
+  "description": "Spins an even larger, longer maelstrom of blades.",
+  "effects": {
+    "maelstrom": {
+      "rpm": 1200,
+      "radius": 3.5,
+      "damage": 2
+    }
+  }
+}
+

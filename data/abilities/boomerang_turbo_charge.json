@@ -1,0 +1,14 @@
+{
+  "id": "boomerang_turbo_charge",
+  "display_name": "Turbo Charge",
+  "type": "active",
+  "cooldown": 45.0,
+  "duration": 10.0,
+  "initial_cooldown": 15.0,
+  "description": "Massively increases attack speed and adds +1 damage to the Boomerang Monkey for a short time.",
+  "effects": {
+    "attack_cooldown_mult": 0.1429,
+    "damage_add": 1
+  }
+}
+
